@@ -17,12 +17,7 @@ export default async function ItemsPage() {
       {/* --- MAIN CONTENT CONTAINER --- */}
       <div className="relative z-10 mx-auto max-w-7xl space-y-6">
         
-        {/* Navigation Back Button */}
-        <div>
-          <Link href="/dashboard" className="inline-flex items-center rounded-full border border-teal-200 bg-white/60 px-4 py-1.5 text-sm font-semibold text-teal-700 shadow-sm backdrop-blur-md transition-colors hover:bg-white/80">
-            &larr; Back to Dashboard
-          </Link>
-        </div>
+
 
         {/* Header Section */}
         <div className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-lg shadow-teal-900/5 backdrop-blur-xl">
