@@ -79,14 +79,14 @@ export default async function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-slate-900">Customer Directory</h2>
+              <h2 className="text-2xl font-bold text-slate-900">Manage Customers</h2>
               <p className="mt-3 text-sm text-slate-600 leading-relaxed">
                 Add new customers, update delivery addresses, and manage your subscriber contact information.
               </p>
             </div>
             <div className="mt-8">
               <Link href="/dashboard/customers" className="inline-flex items-center text-sm font-bold text-emerald-600 transition-colors group-hover:text-emerald-700">
-                Open Directory <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
+               View Customers <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
               </Link>
             </div>
           </div>
@@ -99,14 +99,14 @@ export default async function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-slate-900">Dairy Inventory</h2>
+              <h2 className="text-2xl font-bold text-slate-900">Manage Items</h2>
               <p className="mt-3 text-sm text-slate-600 leading-relaxed">
                 Manage your product catalog, update prices, and configure selling units (Liter, Kg, Packet).
               </p>
             </div>
             <div className="mt-8">
               <Link href="/dashboard/items" className="inline-flex items-center text-sm font-bold text-teal-600 transition-colors group-hover:text-teal-700">
-                Open Inventory <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
+                View Items <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
               </Link>
             </div>
           </div>
