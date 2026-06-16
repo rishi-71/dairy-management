@@ -12,34 +12,70 @@ datasource db {
 }
 
 model Admin {
-  id    String    @id @default(cuid())
-  name  String    
-  email String    @unique
-  password  String  
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model Customer {
-  id    String    @id @default(cuid())
-  name  String
-  mobile  String  @unique 
-  address String  @db.Text
-  isActive  Boolean @default(true)
-  openingBalance  Float @default(0.0)
-  isDeleted Boolean @default(false)
-  morningQuantity Float @default(0.0)
-  eveningQuantity Float @default(0.0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  mobile         String   @unique
+  address        String   @db.Text
+  isActive       Boolean  @default(true)
+  openingBalance Float    @default(0.0)
+  isDeleted      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  subscriptions Subscription[]
+  dailyLogs DailyLog[]
 }
 
 model Item {
-  id    String    @id @default(cuid())
-  name  String
-  price Float
-  unit  String
-  isDeleted Boolean @default(false)
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  unit      String
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions Subscription[]
+  dailyLogs DailyLog[]
+}
+
+model Subscription {
+  id         String @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  itemId     String
+  item       Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  morningQty Float @default(0.0)
+  eveningQty Float @default(0.0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([customerId, itemId])
+}
+
+model DailyLog {
+  id    String  @id @default(cuid())
+  dateStr String
+  customerId  String
+  customer  Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  itemId  String
+  item  Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  morningDelivered  Float @default(0.0)
+  eveningDelivered  Float @default(0.0)
+
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  updateAt  DateTime  @updatedAt
+
+  @@unique([dateStr, customerId, itemId])
 }
