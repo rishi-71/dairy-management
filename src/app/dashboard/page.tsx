@@ -2,9 +2,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import connectDB from "@/lib/mongodb";
-import Customer from "@/models/Customer";
-import Item from "@/models/Item";
+import prisma from "@/lib/prisma"; // Clean Prisma Client Import
 
 export default async function DashboardPage() {
   const session = await getServerSession();
@@ -13,10 +11,14 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Fetch real statistics directly from the database to make the dashboard feel alive
-  await connectDB();
-  const customerCount = await Customer.countDocuments();
-  const itemCount = await Item.countDocuments();
+  // Fetch real MySQL statistics using Prisma (Filtering out soft-deleted records)
+  const customerCount = await prisma.customer.count({
+    where: { isDeleted: false }
+  });
+  
+  const itemCount = await prisma.item.count({
+    where: { isDeleted: false }
+  });
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-emerald-50 via-slate-50 to-teal-100 p-4 sm:p-8 text-slate-900">
@@ -48,7 +50,7 @@ export default async function DashboardPage() {
           </Link>
         </header>
 
-        {/* Quick Stats Row (Fills the empty space beautifully) */}
+        {/* Quick Stats Row (Powered by MySQL + Prisma) */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-3xl border border-white/60 bg-white/60 p-6 shadow-lg shadow-emerald-900/5 backdrop-blur-xl">
             <p className="text-sm font-medium text-slate-500">Total Customers</p>
