@@ -43,7 +43,7 @@ export async function updateItem(id: string, formData: FormData) {
   const price = formData.get("price");
   const unit = formData.get("unit");
 
-  await Item.findByIdAndUpdate(id, { name, price, unit, stock });
+  await Item.findByIdAndUpdate(id, { name, price, unit });
   
   revalidatePath("/dashboard/items");
   redirect("/dashboard/items");
