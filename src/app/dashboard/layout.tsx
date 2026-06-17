@@ -1,18 +1,20 @@
-import { getServerSession } from "next-auth";
+// src/app/dashboard/layout.tsx
 import Link from "next/link";
+import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import SidebarNav from "./SidebarNav"; // 🚀 Imported our new dynamic navigation component
 
 export default async function DashboardLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    const session = await getServerSession();
-    if(!session) {
-        redirect("/login");
-    }
+  const session = await getServerSession();
+  if (!session) {
+    redirect("/login");
+  }
 
-    return (
+  return (
     <div className="relative flex min-h-screen overflow-hidden bg-gradient-to-br from-emerald-50 via-slate-50 to-teal-100 text-slate-900 font-sans">
       
       {/* --- BACKDROP GLOW ANIMATIONS --- */}
@@ -44,31 +46,15 @@ export default async function DashboardLayout({
             <p className="text-xs text-emerald-700 font-medium truncate">{session.user?.email}</p>
           </div>
 
-          {/* Navigation Items Link Options */}
-          <nav className="space-y-1.5">
-            <Link href="/dashboard" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition-all hover:bg-white/80 hover:text-emerald-600">
-              <svg className="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg>
-              Overview Insights
-            </Link>
-            <Link href="/dashboard/customers" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition-all hover:bg-white/80 hover:text-emerald-600">
-              <svg className="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-              Manage Customers
-            </Link>
-            <Link href="/dashboard/items" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition-all hover:bg-white/80 hover:text-emerald-600">
-              <svg className="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-              Dairy Inventory
-            </Link>
-            <Link href="/dashboard/daily-entry" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition-all hover:bg-white/80 hover:text-emerald-600">
-              <svg className="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-              Daily Entries
-            </Link>
-          </nav>
+          {/* 🚀 Dynamic Navigation Menu */}
+          <SidebarNav />
+
         </div>
 
         {/* Bottom Sign Out Component Toggle */}
         <div>
           <Link href="/api/auth/signout" className="flex w-full items-center gap-3 rounded-xl bg-rose-50 px-4 py-3 text-sm font-bold text-rose-600 transition-all border border-rose-100 hover:bg-rose-100 shadow-sm">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
             Sign Out Account
           </Link>
         </div>
@@ -85,7 +71,7 @@ export default async function DashboardLayout({
           <div className="flex gap-2">
             <Link href="/dashboard" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white border border-slate-200">Stats</Link>
             <Link href="/dashboard/customers" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white">Customers</Link>
-            <Link href="/dashboard/items" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white">Items</Link>
+            <Link href="/dashboard/daily-entry" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white">Entries</Link>
           </div>
         </div>
 
@@ -97,5 +83,3 @@ export default async function DashboardLayout({
     </div>
   );
 }
-
-
