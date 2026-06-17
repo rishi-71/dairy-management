@@ -55,6 +55,9 @@ model Subscription {
   itemId     String
   item       Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
+  customerName String @default("")
+  itemName String @default("")
+  
   morningQty Float @default(0.0)
   eveningQty Float @default(0.0)
 
@@ -71,6 +74,10 @@ model DailyLog {
   customer  Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
   itemId  String
   item  Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  customerName String @default("")
+  itemName String @default("")
+  
   morningDelivered  Float @default(0.0)
   eveningDelivered  Float @default(0.0)
 

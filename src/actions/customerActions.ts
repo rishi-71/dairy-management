@@ -53,6 +53,8 @@ export async function addCustomer(formData: FormData) {
             data: {
                 customerId: customer.id,
                 itemId: item.id,
+                customerName: name,
+                itemName: item.name,
                 morningQty: mQty,
                 eveningQty: eQty
             }
@@ -88,6 +90,8 @@ export async function updateCustomer(id: string, formData: FormData) {
       create: {
         customerId: id,
         itemId: item.id,
+        customerName: name,
+        itemName: item.name,
         morningQty: mQty,
         eveningQty: eQty
       }

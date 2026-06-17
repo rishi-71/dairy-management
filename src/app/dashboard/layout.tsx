@@ -58,6 +58,10 @@ export default async function DashboardLayout({
               <svg className="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
               Dairy Inventory
             </Link>
+            <Link href="/dashboard/daily-entry" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition-all hover:bg-white/80 hover:text-emerald-600">
+              <svg className="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+              Daily Entries
+            </Link>
           </nav>
         </div>
 
