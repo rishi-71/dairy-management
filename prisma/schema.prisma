@@ -33,6 +33,7 @@ model Customer {
 
   subscriptions Subscription[]
   dailyLogs DailyLog[]
+  extraLogs ExtraItemLog[]
 }
 
 model Item {
@@ -46,6 +47,7 @@ model Item {
 
   subscriptions Subscription[]
   dailyLogs DailyLog[]
+  extraLogs ExtraItemLog[]
 }
 
 model Subscription {
@@ -77,6 +79,8 @@ model DailyLog {
 
   customerName String @default("")
   itemName String @default("")
+
+  price Float @default(0.0)
   
   morningDelivered  Float @default(0.0)
   eveningDelivered  Float @default(0.0)
@@ -84,5 +88,27 @@ model DailyLog {
   createdAt DateTime  @default(now())
   updateAt  DateTime  @updatedAt
 
+  @@unique([dateStr, customerId, itemId])
+}
+
+model ExtraItemLog {
+  id           String   @id @default(cuid())
+  dateStr      String
+  
+  customerId   String
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  itemId       String
+  item         Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  customerName String   @default("")
+  itemName     String   @default("")
+  price        Float    @default(0.0)
+  quantity     Float    @default(1.0) // Extra item ki quantity
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Ek customer, ek din mein, same extra item ki ek hi entry rakhega (quantity update hogi)
   @@unique([dateStr, customerId, itemId])
 }

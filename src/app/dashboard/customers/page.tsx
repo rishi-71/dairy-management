@@ -1,70 +1,74 @@
+// src/app/dashboard/customers/page.tsx
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { getCustomers,deleteCustomer, addCustomer } from "@/actions/customerActions";
+import { getCustomers, deleteCustomer, addCustomer } from "@/actions/customerActions";
 
 export const dynamic = 'force-dynamic';
 
 export default async function CustomersPage() {
   const customers = await getCustomers();
-
   const activeProducts = await prisma.item.findMany({
-    where: { isDeleted: false}
+    where: { isDeleted: false }
   });
 
   return (
     <div className="space-y-6">
       
+      {/* Header */}
       <div className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-lg shadow-emerald-950/5 backdrop-blur-xl">
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Customer Management</h1>
-        <p className="mt-1 text-sm text-slate-600">Configure customized product multi-subscriptions per client.</p>
+        <p className="mt-1 text-sm text-slate-600">Configure customized product subscriptions per client.</p>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
         
-        {/* LEFT PANEL: Quick Add with Dynamic Product Iteration Inputs */}
+        {/* ========================================== */}
+        {/* LEFT PANEL: Quick Add with Single Dropdown */}
+        {/* ========================================== */}
         <div className="space-y-6 lg:col-span-4 lg:sticky lg:top-8">
           <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur-xl max-h-[85vh] overflow-y-auto">
             <h2 className="mb-4 text-xl font-bold text-slate-900">Quick Add Account</h2>
             <form action={addCustomer} className="space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-700">Full Name</label>
-                <input type="text" name="name" required placeholder="e.g. Rahul Patole" className="block w-full rounded-xl border border-slate-200 bg-white/50 px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:text-sm" />
+                <input type="text" name="name" required placeholder="e.g. Rahul Patole" className="block w-full rounded-xl border border-slate-200 bg-white/50 px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:text-sm" />
               </div>
               <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-700">Mobile Number</label>
-                <input type="tel" name="mobile" required placeholder="e.g. 9876543210" className="block w-full rounded-xl border border-slate-200 bg-white/50 px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:text-sm" />
+                <input type="tel" name="mobile" required placeholder="e.g. 9876543210" className="block w-full rounded-xl border border-slate-200 bg-white/50 px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:text-sm" />
               </div>
               <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-700">Opening Balance (₹)</label>
-                <input type="number" name="openingBalance" step="0.01" defaultValue="0" className="block w-full rounded-xl border border-slate-200 bg-white/50 px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:text-sm" />
+                <input type="number" name="openingBalance" step="0.01" defaultValue="0" className="block w-full rounded-xl border border-slate-200 bg-white/50 px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:text-sm" />
               </div>
               <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-700">Address</label>
-                <textarea name="address" rows={2} required placeholder="Delivery address..." className="block w-full resize-none rounded-xl border border-slate-200 bg-white/50 px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:text-sm" />
+                <textarea name="address" rows={2} required placeholder="Delivery address..." className="block w-full resize-none rounded-xl border border-slate-200 bg-white/50 px-4 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:text-sm" />
               </div>
 
-              {/* Dynamic Subscriptions Sub-Grid section block */}
+              {/* 🚀 NEW UI: Single Product Daily Requirement */}
               <div className="border-t border-slate-200/80 pt-4 mt-2">
-                <h3 className="text-sm font-black text-emerald-800 uppercase tracking-wider mb-3">Product Daily Requirements</h3>
-                <div className="space-y-4 max-h-48 overflow-y-auto pr-1">
-                  {activeProducts.map((product) => (
-                    <div key={product.id} className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/40 space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-extrabold text-slate-800 truncate max-w-[150px]">{product.name}</span>
-                        <span className="text-[11px] font-bold text-slate-400">₹{product.price}/{product.unit.substring(0,3)}</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-500">Morning (AM)</span>
-                          <input type="number" name={`item_${product.id}_morning`} step="0.1" defaultValue="0" min="0" className="block w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none" />
-                        </div>
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-500">Evening (PM)</span>
-                          <input type="number" name={`item_${product.id}_evening`} step="0.1" defaultValue="0" min="0" className="block w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none" />
-                        </div>
-                      </div>
+                <h3 className="text-sm font-black text-emerald-800 uppercase tracking-wider mb-3">Daily Requirement</h3>
+                <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/40 space-y-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-slate-500">Select Product</label>
+                    <select name="singleItemId" required defaultValue="" className="block w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
+                      <option value="" disabled>-- Choose an item --</option>
+                      {activeProducts.map((p: any) => (
+                        <option key={p.id} value={p.id}>{p.name} (₹{p.price})</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">Morning Qty</label>
+                      <input type="number" name="singleMorning" step="0.1" defaultValue="0" min="0" className="block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500" />
                     </div>
-                  ))}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">Evening Qty</label>
+                      <input type="number" name="singleEvening" step="0.1" defaultValue="0" min="0" className="block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -77,7 +81,9 @@ export default async function CustomersPage() {
           </div>
         </div>
 
+        {/* ========================================== */}
         {/* RIGHT COLUMN: Directory Active Client List */}
+        {/* ========================================== */}
         <div className="lg:col-span-8">
           <div className="overflow-hidden rounded-3xl border border-white/60 bg-white/80 shadow-xl shadow-emerald-950/5 backdrop-blur-xl">
             <div className="overflow-x-auto">
@@ -105,7 +111,7 @@ export default async function CustomersPage() {
                         </td>
                         <td className="px-6 py-5 text-sm font-medium text-slate-600 max-w-xs truncate">{customer.address}</td>
                         
-                        {/* Dynamic Subscriptions Column Loop mapping items tags */}
+                        {/* 🚀 FIXED: Subscriptions Column (No Inputs Here, Only Badges) */}
                         <td className="px-6 py-5 max-w-xs">
                           <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                             {customer.subscriptions.length === 0 ? (
