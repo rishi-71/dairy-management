@@ -130,8 +130,17 @@ export default async function CustomersPage() {
                         <td className="whitespace-nowrap px-6 py-5 text-sm font-black text-rose-600">
                           ₹{customer.openingBalance}
                         </td>
-                        <td className="whitespace-nowrap px-6 py-5 text-sm flex justify-end gap-4 items-center">
-                          <Link href={`/dashboard/customers/${customer.id}`} className="font-semibold text-emerald-600 hover:text-emerald-800">Edit</Link>
+                        <td className="whitespace-nowrap px-6 py-5 text-sm flex justify-end gap-3 items-center">
+                          {/* 🚀 NEW: View Ledger Button */}
+                          <Link 
+                            href={`/dashboard/customers/${customer.id}/ledger`} 
+                            className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-1.5 font-bold text-blue-700 transition-colors hover:bg-blue-100 flex items-center gap-1"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Ledger
+                          </Link>
+
+                          <Link href={`/dashboard/customers/${customer.id}`} className="font-semibold text-emerald-600 hover:text-emerald-800 px-2">Edit</Link>
                           <form action={deleteCustomer}>
                             <input type="hidden" name="id" value={customer.id} />
                             <button type="submit" className="font-semibold text-rose-500 hover:text-rose-700">Delete</button>
