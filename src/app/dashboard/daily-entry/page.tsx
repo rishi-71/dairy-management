@@ -31,8 +31,9 @@ export default function DailyEntryPage() {
       setAllItems(response.allItems || []);
 
       let mappedData: any[] = [];
-      const sourceData = existing ? response.data : response.data;
+      const sourceData = response.data || [];
 
+      // 1. Map Primary Data
       mappedData = sourceData.map((log: any) => ({
         customerId: log.customerId,
         itemId: log.itemId,
@@ -41,11 +42,11 @@ export default function DailyEntryPage() {
         morningQty: existing ? log.morningDelivered : log.morningQty,
         eveningQty: existing ? log.eveningDelivered : log.eveningQty,
         price: existing ? log.price : (log.item?.price || 0),
-        extraItems: [] // 🚀 NEW: Empty array for extra items inside the row
+        extraItems: [] // Khali array shuru mein
       }));
       
-      // 🚀 NEW: Attach fetched extra items to the first matching customer row
-      if (response.extraLogs) {
+      // 2. Safely Map Extra Items fetched from DB
+      if (response.extraLogs && response.extraLogs.length > 0) {
         response.extraLogs.forEach((extra: any) => {
           const targetRow = mappedData.find(e => e.customerId === extra.customerId);
           if (targetRow) {
@@ -53,7 +54,7 @@ export default function DailyEntryPage() {
               itemId: extra.itemId,
               itemName: extra.itemName,
               price: extra.price,
-              qty: extra.quantity
+              qty: extra.quantity // Database uses 'quantity', map to 'qty'
             });
           }
         });
@@ -74,30 +75,41 @@ export default function DailyEntryPage() {
 
   const handleQuantityChange = (index: number, field: string, value: string) => {
     const updatedEntries = [...entries];
-    updatedEntries[index][field] = parseFloat(value) || 0;
+    updatedEntries[index] = { ...updatedEntries[index], [field]: parseFloat(value) || 0 };
     setEntries(updatedEntries);
   };
 
-  // 🚀 NEW: Handle Extra Item Addition directly into the row
   const handleAddExtraItem = (entryIndex: number, itemId: string) => {
     if (!itemId) return;
     const itemToAdd = allItems.find(i => i.id === itemId);
     if (!itemToAdd) return;
 
     const updatedEntries = [...entries];
+    // Deep copy extra items array
+    updatedEntries[entryIndex] = {
+      ...updatedEntries[entryIndex],
+      extraItems: [...updatedEntries[entryIndex].extraItems]
+    };
+
     updatedEntries[entryIndex].extraItems.push({
       itemId: itemToAdd.id,
       itemName: itemToAdd.name,
       price: itemToAdd.price,
-      qty: 1 // Default 1
+      qty: 1
     });
     setEntries(updatedEntries);
   };
 
-  // 🚀 NEW: Update Extra Item Quantity
   const handleExtraQtyChange = (entryIndex: number, extraIndex: number, value: string) => {
     const updatedEntries = [...entries];
-    updatedEntries[entryIndex].extraItems[extraIndex].qty = parseFloat(value) || 0;
+    updatedEntries[entryIndex] = {
+      ...updatedEntries[entryIndex],
+      extraItems: [...updatedEntries[entryIndex].extraItems]
+    };
+    updatedEntries[entryIndex].extraItems[extraIndex] = {
+      ...updatedEntries[entryIndex].extraItems[extraIndex],
+      qty: parseFloat(value) || 0
+    };
     setEntries(updatedEntries);
   };
 
@@ -165,9 +177,8 @@ export default function DailyEntryPage() {
                   ) : (
                     entries.map((entry, idx) => {
                       
-                      // Find items this customer DOES NOT have yet
+                      // Dropdown filter logic
                       const customerCurrentItems = entries.filter(e => e.customerId === entry.customerId).map(e => e.itemId);
-                      // Include extra items already added in the cell
                       entry.extraItems.forEach((ex: any) => customerCurrentItems.push(ex.itemId));
                       const availableExtraItems = (allItems || []).filter(i => !customerCurrentItems.includes(i.id));
 
@@ -175,10 +186,9 @@ export default function DailyEntryPage() {
                         <tr key={`${entry.customerId}-${entry.itemId}`} className="hover:bg-slate-50/50 transition-colors">
                           <td className="px-6 py-4 text-sm font-bold text-slate-900">{entry.customerName}</td>
                           <td className="px-6 py-4">
-  <p className="text-sm font-bold text-emerald-700">{entry.itemName}</p>
-  {/* 🚀 Naya Price Lock Label */}
-  <p className="text-[10px] font-extrabold text-slate-400">Locked @ ₹{entry.price}/unit</p>
-</td>
+                            <p className="text-sm font-bold text-emerald-700">{entry.itemName}</p>
+                            <p className="text-[10px] font-extrabold text-slate-400">Locked @ ₹{entry.price}/unit</p>
+                          </td>
                           
                           <td className="px-6 py-4 text-center">
                             {isEditMode ? (
@@ -195,17 +205,14 @@ export default function DailyEntryPage() {
                             )}
                           </td>
 
-                          {/* 🚀 NEW COLUMN: INLINE EXTRA ITEMS */}
                           <td className="px-6 py-4 text-right">
                             <div className="flex flex-col gap-2 items-end">
-                              
-                              {/* Display already selected extra items for this row */}
                               {entry.extraItems.map((extra: any, extraIdx: number) => (
                                 <div key={extra.itemId} className="flex items-center gap-2 bg-emerald-50 px-2 py-1.5 rounded-lg border border-emerald-100">
                                   <span className="text-[11px] font-bold text-emerald-800">{extra.itemName} (₹{extra.price})</span>
                                   {isEditMode ? (
                                     <input 
-                                      type="number" step="1" min="0" 
+                                      type="number" step="0.5" min="0" 
                                       value={extra.qty} 
                                       onChange={(e) => handleExtraQtyChange(idx, extraIdx, e.target.value)} 
                                       className="w-14 text-center text-xs p-1 rounded-md border border-slate-300 focus:outline-none focus:border-emerald-500" 
@@ -218,7 +225,6 @@ export default function DailyEntryPage() {
                                 </div>
                               ))}
 
-                              {/* Dropdown to add more */}
                               {isEditMode && availableExtraItems.length > 0 && (
                                 <select 
                                   className="text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg px-2 py-1.5 outline-none cursor-pointer hover:bg-slate-50 transition-colors max-w-[150px]"
@@ -227,9 +233,7 @@ export default function DailyEntryPage() {
                                 >
                                   <option value="" disabled>+ Extra Item</option>
                                   {availableExtraItems.map(item => (
-                                    <option key={item.id} value={item.id}>
-                                      {item.name} (₹{item.price})
-                                    </option>
+                                    <option key={item.id} value={item.id}>{item.name} (₹{item.price})</option>
                                   ))}
                                 </select>
                               )}
