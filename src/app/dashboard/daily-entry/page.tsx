@@ -228,7 +228,7 @@ export default function DailyEntryPage() {
                               {isEditMode && availableExtraItems.length > 0 && (
                                 <select 
                                   className="text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg px-2 py-1.5 outline-none cursor-pointer hover:bg-slate-50 transition-colors max-w-[150px]"
-                                  onChange={(e) => handleAddExtraItem(idx, e.target.value)}
+                                  onChange={(e) => handleAddExtraItem(idx, Number(e.target.value))}
                                   value=""
                                 >
                                   <option value="" disabled>+ Extra Item</option>

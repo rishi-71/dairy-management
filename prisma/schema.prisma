@@ -21,7 +21,7 @@ model Admin {
 }
 
 model Customer {
-  id             String   @id @default(cuid())
+  id             Int   @id @default(autoincrement())
   name           String
   mobile         String   @unique
   address        String   @db.Text
@@ -37,7 +37,7 @@ model Customer {
 }
 
 model Item {
-  id        String   @id @default(cuid())
+  id        Int  @id @default(autoincrement())
   name      String
   price     Float
   unit      String
@@ -51,10 +51,10 @@ model Item {
 }
 
 model Subscription {
-  id         String @id @default(cuid())
-  customerId String
+  id         Int  @id @default(autoincrement())
+  customerId Int
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  itemId     String
+  itemId     Int
   item       Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   customerName String @default("")
@@ -70,11 +70,11 @@ model Subscription {
 }
 
 model DailyLog {
-  id    String  @id @default(cuid())
+  id    Int  @id @default(autoincrement())
   dateStr String
-  customerId  String
+  customerId  Int
   customer  Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  itemId  String
+  itemId  Int
   item  Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   customerName String @default("")
@@ -95,10 +95,10 @@ model ExtraItemLog {
   id           String   @id @default(cuid())
   dateStr      String
   
-  customerId   String
+  customerId   Int
   customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   
-  itemId       String
+  itemId       Int
   item         Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
   
   customerName String   @default("")

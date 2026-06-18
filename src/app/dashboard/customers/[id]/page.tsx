@@ -16,7 +16,7 @@ export default async function EditCustomerPage({ params }: { params: Promise<{ i
     (p) => !customer.subscriptions.some((sub: any) => sub.itemId === p.id)
   );
 
-  const updateCustomerWithId = updateCustomer.bind(null, customer.id);
+  const updateCustomerWithId = updateCustomer.bind(null, customer.id.toString());
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 via-slate-50 to-teal-100 px-4 py-12 sm:px-6 lg:px-8">

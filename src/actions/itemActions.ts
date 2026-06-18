@@ -14,7 +14,7 @@ export async function getItems() {
 
 export async function getItemById(id: string) {
   const item = await prisma.item.findUnique({
-    where: { id }
+    where: { id: Number(id) }
   });
   return item;
 }
@@ -42,7 +42,7 @@ export async function updateItem(id:string, formData: FormData) {
   const price = parseFloat(priceStr);
 
   await prisma.item.update({
-    where: { id },
+    where: { id: Number(id) },
     data: { name, price, unit }
   });
 
@@ -51,7 +51,7 @@ export async function updateItem(id:string, formData: FormData) {
 }
 
 export async function deleteItem(formData: FormData) {
-  const id = formData.get("id") as string;
+  const id = Number(formData.get("id"));
 
   await prisma.item.update({
     where: { id },
