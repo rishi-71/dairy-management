@@ -35,7 +35,7 @@ export default async function DashboardLayout({
             </div>
             <div>
               <span className="text-lg font-black tracking-tight text-slate-900 uppercase">Dairy</span>
-              <span className="text-lg font-bold tracking-tight text-emerald-600 uppercase ml-1">SaaS</span>
+              <span className="text-lg font-bold tracking-tight text-emerald-600 uppercase ml-1">Farm</span>
             </div>
           </div>
 
@@ -66,12 +66,13 @@ export default async function DashboardLayout({
         {/* Responsive Mobile Header Navigation Bar */}
         <div className="flex lg:hidden justify-between items-center rounded-2xl border border-white/60 bg-white/70 p-4 shadow-md backdrop-blur-lg mb-6">
           <div className="flex items-center gap-2">
-            <span className="text-md font-black tracking-tight text-slate-900 uppercase">Dairy App</span>
+            <span className="text-md font-black tracking-tight text-slate-900 uppercase">Dairy Farm</span>
           </div>
           <div className="flex gap-2">
             <Link href="/dashboard" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white border border-slate-200">Stats</Link>
             <Link href="/dashboard/customers" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white">Customers</Link>
             <Link href="/dashboard/daily-entry" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white">Entries</Link>
+            <Link href="/dashboard/reports" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white">Reports</Link>
           </div>
         </div>
 
