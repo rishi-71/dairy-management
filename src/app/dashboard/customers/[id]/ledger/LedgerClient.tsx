@@ -72,7 +72,8 @@ export default function LedgerClient({ customer }: { customer: any }) {
   const handleSaveEdit = async () => {
     setIsSavingEdit(true);
     try {
-      await updateLedgerDay(editLogs, editExtras);
+      // 🚀 FIXED: Passing customer.id and editModal.dayStr
+      await updateLedgerDay(customer.id, editModal.dayStr, editLogs, editExtras);
       setEditModal({ isOpen: false, dayStr: "" }); // Close Modal
       await loadLedger(); // Refresh Background Grid
     } catch (error) {

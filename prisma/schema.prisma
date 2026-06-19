@@ -34,6 +34,7 @@ model Customer {
   subscriptions Subscription[]
   dailyLogs DailyLog[]
   extraLogs ExtraItemLog[]
+  monthlyBills MonthlyBill[]
 }
 
 model Item {
@@ -111,4 +112,30 @@ model ExtraItemLog {
 
   // Ek customer, ek din mein, same extra item ki ek hi entry rakhega (quantity update hogi)
   @@unique([dateStr, customerId, itemId])
+}
+
+model MonthlyBill {
+  id  Int @id @default(autoincrement())
+  monthYear String
+
+  customerId Int
+  customer  Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerName String @default("")
+
+  totalMorningLtrs  Float @default(0.0)
+  totalEveningLtrs Float @default(0.0)
+  milkTotalAmount Float @default(0.0)
+  extraItemsAmount Float @default(0.0)
+
+  previousDue Float @default(0.0)
+  grandTotal Float @default(0.0)
+
+  isPaid Boolean @default(false)
+  amountPaid Float @default(0.0)
+  paymentDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([customerId, monthYear])
 }
