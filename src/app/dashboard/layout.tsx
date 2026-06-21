@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import SidebarNav from "./SidebarNav"; // 🚀 Imported our new dynamic navigation component
+import AiAssistant from "@/components/AiAssistant";
 
 export default async function DashboardLayout({
   children,
@@ -81,6 +82,7 @@ export default async function DashboardLayout({
           {children}
         </div>
       </main>
+      <AiAssistant />
     </div>
   );
 }
