@@ -7,6 +7,7 @@ import Link from "next/link";
 // Hook for Number Counting Animation
 function useCountUp(end: number, duration: number = 1500) {
   const [count, setCount] = useState(0);
+ 
 
   useEffect(() => {
     let startTime: number;
@@ -34,8 +35,9 @@ function useCountUp(end: number, duration: number = 1500) {
 
 export default function DashboardStats({ customers, items, balance, morningVol, eveningVol, itemDistribution, recentCustomers }: any) {
   const [currentTime, setCurrentTime] = useState(new Date());
-  
+   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
+    setIsMounted(true);
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -63,13 +65,13 @@ export default function DashboardStats({ customers, items, balance, morningVol, 
           <p className="mt-2 text-sm text-slate-600">Here is your live enterprise overview.</p>
         </div>
         <div className="hidden sm:block text-right">
-          <p className="text-2xl font-black text-emerald-600 tracking-tighter">
-            {currentTime.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute:'2-digit', second:'2-digit' })}
-          </p>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
-            {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
-        </div>
+           <p className="text-2xl font-black text-emerald-600 tracking-tighter">
+             {isMounted ? currentTime.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' }) : "00:00:00"}
+           </p>
+           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+             {isMounted ? currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : "Loading date..."}
+           </p>
+         </div>
       </div>
 
       {/* --- 4 KPI CARDS --- */}
