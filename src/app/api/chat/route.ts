@@ -11,6 +11,8 @@ import {
  getCustomerByName,
  getDashboardStats,
  createCustomer,
+ updateCustomer,
+ getCustomerLedger,
 } from "@/ai/tools/mcpTools";
 //import { getDashboardStats } from "@/mcp/tools/dashboard";
 //import { getOutstandingCustomers } from "@/mcp/tools/billing";
@@ -29,7 +31,7 @@ export async function POST(req: Request) {
       );
 
     const result = streamText({
-       model: google("gemini-2.0-flash-lite"),
+       model: google("gemini-2.5-flash-lite"),
 //       onStepFinish(step) {
 //   console.log("STEP:");
 //   console.dir(step, { depth: null });
@@ -87,6 +89,63 @@ Tool Call:
 
 Never say you cannot create customers if createCustomer tool is available.
 Always use the tool.
+
+UPDATE CUSTOMER RULES
+
+If user says:
+
+"Update Virat mobile to 9999999999"
+
+Use:
+
+updateCustomer
+
+{
+  "customerName": "Virat",
+  "mobile": "9999999999"
+}
+
+--------------------------------
+
+"Change Sachin address to Pune"
+
+Use:
+
+updateCustomer
+
+{
+  "customerName": "Sachin",
+  "address": "Pune"
+}
+
+--------------------------------
+
+"Set Rohit balance to 500"
+
+Use:
+
+updateCustomer
+
+{
+  "customerName": "Rohit",
+  "openingBalance": 500
+}
+
+LEDGER RULES
+
+If user asks:
+
+Show Sachin ledger
+
+Show Virat ledger
+
+Show June ledger of Rohit
+
+What was delivered to Sachin
+
+Use:
+
+getCustomerLedger
 `
 
 ,
@@ -98,6 +157,8 @@ Always use the tool.
        getCustomerByName,
        getDashboardStats,
        createCustomer,
+       updateCustomer,
+       getCustomerLedger,
       },
 
       toolChoice: "auto",

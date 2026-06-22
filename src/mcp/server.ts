@@ -7,84 +7,54 @@ import cors from "cors";
 import { createCustomer } from "./tools/customer-write";
 import { updateCustomer } from "./tools/customer-update";
 
+import { getCustomersList, getCustomerByName } from "./tools/customers";
 
-import {
-  getCustomersList,
-  getCustomerByName,
-} from "./tools/customers";
+import { getDashboardStats } from "./tools/dashboard";
 
-import {
-  getDashboardStats,
-} from "./tools/dashboard";
+import { getCustomerLedger } from "./tools/ledger";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.post(
-  "/mcp",
-  async (req, res) => {
-    try {
-      const {
-        tool,
-        args,
-      } = req.body;
+app.post("/mcp", async (req, res) => {
+  try {
+    const { tool, args } = req.body;
 
-      switch (tool) {
-        case "getCustomersList":
-          return res.json(
-            await getCustomersList()
-          );
+    switch (tool) {
+      case "getCustomersList":
+        return res.json(await getCustomersList());
 
-        case "getCustomerByName":
-          return res.json(
-            await getCustomerByName(
-              args.name
-            )
-          );
+      case "getCustomerByName":
+        return res.json(await getCustomerByName(args.name));
 
-        case "getDashboardStats":
-          return res.json(
-            await getDashboardStats()
-          );
+      case "getDashboardStats":
+        return res.json(await getDashboardStats());
 
-          case "createCustomer":
-  return res.json(
-    await createCustomer(args)
-  );
+      case "createCustomer":
+        return res.json(await createCustomer(args));
 
-  case "updateCustomer":
-  return res.json(
-    await updateCustomer(args)
-  );
+      case "updateCustomer":
+        return res.json(await updateCustomer(args));
 
-        default:
-          return res
-            .status(404)
-            .json({
-              error:
-                "Tool not found",
-            });
-      }
-    } catch (error) {
-      console.error(error);
+       case "getCustomerLedger":
+        return res.json( await getCustomerLedger( args.customerName));
 
-      return res
-        .status(500)
-        .json({
-          error:
-            "MCP Server Error",
+      default:
+        return res.status(404).json({
+          error: "Tool not found",
         });
     }
-  }
-);
+  } catch (error) {
+    console.error(error);
 
-app.listen(
-  3001,
-  () => {
-    console.log(
-      "🚀 MCP Server running on port 3001"
-    );
+    return res.status(500).json({
+      error: "MCP Server Error",
+    });
   }
-);
+});
+
+app.listen(3001, () => {
+  console.log("🚀 MCP Server running on port 3001");
+});

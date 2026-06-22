@@ -67,3 +67,51 @@ export const createCustomer = tool({
     );
   },
 });
+
+export const updateCustomer = tool({
+  description:
+    "Update customer mobile, address or balance",
+
+  parameters: z.object({
+    customerName:
+      z.string(),
+
+    mobile:
+      z.string().optional(),
+
+    address:
+      z.string().optional(),
+
+    openingBalance:
+      z.number().optional(),
+  }),
+
+  execute: async (input) => {
+    return await callMCP(
+      "updateCustomer",
+      input
+    );
+  },
+});
+
+export const getCustomerLedger =
+tool({
+  description:
+    "Get full ledger of a customer",
+
+  parameters: z.object({
+    customerName:
+      z.string(),
+  }),
+
+  execute: async ({
+    customerName,
+  }) => {
+    return await callMCP(
+      "getCustomerLedger",
+      {
+        customerName,
+      }
+    );
+  },
+});

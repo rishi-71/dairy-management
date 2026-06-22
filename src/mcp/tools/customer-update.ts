@@ -1,29 +1,39 @@
 import prisma from "@/lib/prisma";
 
-type UpdateCustomerInput = {
-  id: number;
-
-  name?: string;
+export interface UpdateCustomerInput {
+  customerName: string;
   mobile?: string;
   address?: string;
   openingBalance?: number;
-  isActive?: boolean;
-};
+}
 
 export async function updateCustomer(
   data: UpdateCustomerInput
 ) {
   const customer =
+    await prisma.customer.findFirst({
+      where: {
+        name: {
+          contains:
+            data.customerName,
+        },
+        isDeleted: false,
+      },
+    });
+
+  if (!customer) {
+    throw new Error(
+      "Customer not found"
+    );
+  }
+
+  const updated =
     await prisma.customer.update({
       where: {
-        id: data.id,
+        id: customer.id,
       },
 
       data: {
-        ...(data.name && {
-          name: data.name,
-        }),
-
         ...(data.mobile && {
           mobile: data.mobile,
         }),
@@ -32,19 +42,13 @@ export async function updateCustomer(
           address: data.address,
         }),
 
-        ...(data.openingBalance !==
-          undefined && {
+        ...(typeof data.openingBalance ===
+          "number" && {
           openingBalance:
             data.openingBalance,
-        }),
-
-        ...(data.isActive !==
-          undefined && {
-          isActive:
-            data.isActive,
         }),
       },
     });
 
-  return customer;
+  return updated;
 }
