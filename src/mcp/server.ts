@@ -4,6 +4,8 @@ dotenv.config();
 console.log("DATABASE_URL:", process.env.DATABASE_URL);
 import express from "express";
 import cors from "cors";
+import { createCustomer } from "./tools/customer-write";
+import { updateCustomer } from "./tools/customer-update";
 
 
 import {
@@ -46,6 +48,16 @@ app.post(
           return res.json(
             await getDashboardStats()
           );
+
+          case "createCustomer":
+  return res.json(
+    await createCustomer(args)
+  );
+
+  case "updateCustomer":
+  return res.json(
+    await updateCustomer(args)
+  );
 
         default:
           return res

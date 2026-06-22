@@ -6,9 +6,15 @@ import {
 } from "ai";
 
 
-import { getCustomersList, getCustomerByName, getCustomerSubscriptions } from "@/mcp/tools/customers";
-import { getDashboardStats } from "@/mcp/tools/dashboard";
-import { getOutstandingCustomers } from "@/mcp/tools/billing";
+import {
+ getCustomersList,
+ getCustomerByName,
+ getDashboardStats,
+ createCustomer,
+} from "@/ai/tools/mcpTools";
+//import { getDashboardStats } from "@/mcp/tools/dashboard";
+//import { getOutstandingCustomers } from "@/mcp/tools/billing";
+
 
 
 export const maxDuration = 30;
@@ -23,7 +29,7 @@ export async function POST(req: Request) {
       );
 
     const result = streamText({
-       model: google("gemini-2.5-flash"),
+       model: google("gemini-2.0-flash-lite"),
 //       onStepFinish(step) {
 //   console.log("STEP:");
 //   console.dir(step, { depth: null });
@@ -39,75 +45,48 @@ export async function POST(req: Request) {
 system: `
 You are Dairy AI Core.
 
-You are connected to the dairy management database.
+You can READ and MODIFY dairy data.
 
-IMPORTANT RULES:
+AVAILABLE ACTIONS:
 
-Whenever a user mentions a person's name,
-ALWAYS check the customer database first.
-
-Examples:
-
-"Tell me about Virat Kohli"
-→ use getCustomerByName
-
-"Show Sachin details"
-→ use getCustomerByName
-
-"What is Rohit's balance?"
-→ use getCustomerByName
-
-"Show all customers"
+1. Show all customers
 → use getCustomersList
 
-Never assume a person is not a customer.
-Always search the database first.
+2. Find customer details
+→ use getCustomerByName
 
-IMPORTANT:
+3. Show dashboard statistics
+→ use getDashboardStats
 
-When using getCustomerByName:
+4. Create a new customer
+→ use createCustomer
+
+Whenever a user asks:
+
+- Add customer
+- Create customer
+- Register customer
+- New customer
+
+You MUST use createCustomer.
 
 Example:
 
 User:
-"Show Virat Kohli details"
+Create customer named Hardik Pandya
+mobile 9999999991
+address Mumbai
 
 Tool Call:
+
 {
-  "name": "Virat Kohli"
+  "name": "Hardik Pandya",
+  "mobile": "9999999991",
+  "address": "Mumbai"
 }
 
-User:
-"Tell me about Sachin"
-
-Tool Call:
-{
-  "name": "Sachin"
-}
-
-Always extract the person's name and pass it to the tool.
-
-If the user asks:
-
-"Show dashboard stats"
-"Dashboard summary"
-"Business summary"
-"Overall statistics"
-"How many customers do I have?"
-"How much outstanding ledger do I have?"
-
-ALWAYS use getDashboardStats.
-Do not answer from general knowledge.
-
-If the user asks:
-
-- Who owes me money?
-- Show pending bills
-- Show unpaid customers
-- Outstanding balances
-- Who has not paid?
-
-Always use getOutstandingCustomers.
+Never say you cannot create customers if createCustomer tool is available.
+Always use the tool.
 `
 
 ,
@@ -117,10 +96,11 @@ Always use getOutstandingCustomers.
       tools: {
        getCustomersList,
        getCustomerByName,
-       getCustomerSubscriptions,
        getDashboardStats,
-       getOutstandingCustomers,
+       createCustomer,
       },
+
+      toolChoice: "auto",
 
     });
 
