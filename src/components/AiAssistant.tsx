@@ -88,6 +88,62 @@ export default function AiAssistant() {
     </div>
   );
 }
+
+if (
+  part.type ===
+  "tool-getOutstandingCustomers"
+) {
+  if (
+    part.state !==
+    "output-available"
+  ) {
+    return (
+      <div
+        key={index}
+        className="bg-red-50 border p-3 rounded"
+      >
+        Loading outstanding customers...
+      </div>
+    );
+  }
+
+  return (
+    <div
+      key={index}
+      className="bg-red-50 border border-red-200 p-3 rounded"
+    >
+      <h3 className="font-bold mb-2">
+        Outstanding Customers
+      </h3>
+
+      {part.output.map(
+        (customer: any, i: number) => (
+          <div
+            key={i}
+            className="border-b py-2"
+          >
+            <div className="font-semibold">
+              {customer.customerName}
+            </div>
+
+            <div>
+              Month:
+              {" "}
+              {customer.monthYear}
+            </div>
+
+            <div className="text-red-600">
+              Due:
+              {" "}
+              ₹
+              {customer.dueAmount}
+            </div>
+          </div>
+        )
+      )}
+    </div>
+  );
+}
               if (part.type === "tool-getCustomerByName") {
                 const customer = part.output;
 

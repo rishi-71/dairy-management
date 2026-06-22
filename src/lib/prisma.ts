@@ -1,6 +1,10 @@
 // src/lib/prisma.ts
+
 import { PrismaClient } from '@prisma/client';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+
+// console.log("PRISMA FILE LOADED");
+// console.log("DATABASE_URL =", process.env.DATABASE_URL);
 
 const prismaClientSingleton = () => {
   // Convert mysql:// to mariadb:// because the underlying JS driver requires it at runtime

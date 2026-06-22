@@ -6,8 +6,10 @@ import {
 } from "ai";
 
 
-import { getCustomersList, getCustomerByName, getCustomerSubscriptions } from "@/ai/tools/customers";
-import { getDashboardStats } from "@/ai/tools/dashboard";
+import { getCustomersList, getCustomerByName, getCustomerSubscriptions } from "@/mcp/tools/customers";
+import { getDashboardStats } from "@/mcp/tools/dashboard";
+import { getOutstandingCustomers } from "@/mcp/tools/billing";
+
 
 export const maxDuration = 30;
 
@@ -96,6 +98,16 @@ If the user asks:
 
 ALWAYS use getDashboardStats.
 Do not answer from general knowledge.
+
+If the user asks:
+
+- Who owes me money?
+- Show pending bills
+- Show unpaid customers
+- Outstanding balances
+- Who has not paid?
+
+Always use getOutstandingCustomers.
 `
 
 ,
@@ -107,6 +119,7 @@ Do not answer from general knowledge.
        getCustomerByName,
        getCustomerSubscriptions,
        getDashboardStats,
+       getOutstandingCustomers,
       },
 
     });
