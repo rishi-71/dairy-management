@@ -35,6 +35,7 @@ export default function AiAssistant() {
 
             {msg.parts?.map((part, index) => {
               // Normal text response
+              console.log("PART: ", part);
               if (part.type === "text") {
                 return (
                   <p
@@ -45,6 +46,76 @@ export default function AiAssistant() {
                   </p>
                 );
               }
+
+              if (
+  part.type ===
+  "tool-getCustomerByName"
+) {
+  const customer = part.output;
+
+  if (!customer) {
+    return (
+      <div
+        key={index}
+        className="text-red-500"
+      >
+        Customer not found
+      </div>
+    );
+  }
+
+  return (
+    <div
+      key={index}
+      className="bg-blue-50 border border-blue-200 p-3 rounded-lg"
+    >
+      <h3 className="font-bold mb-2">
+        Customer Details
+      </h3>
+
+      <div>
+        <b>Name:</b> {customer.name}
+      </div>
+
+      <div>
+        <b>Mobile:</b> {customer.mobile}
+      </div>
+
+      <div>
+        <b>Balance:</b> ₹
+        {customer.openingBalance}
+      </div>
+
+      <div>
+        <b>Address:</b> {customer.address}
+      </div>
+
+      {customer.subscriptions?.length >
+        0 && (
+        <div className="mt-3">
+          <b>Subscriptions:</b>
+
+          {customer.subscriptions.map(
+            (sub: any) => (
+              <div
+                key={sub.id}
+                className="ml-3"
+              >
+                • {sub.itemName}
+                {" "}
+                (M:
+                {sub.morningQty}
+                {" "}
+                E:
+                {sub.eveningQty})
+              </div>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
               // Customer tool output
               if (

@@ -2,10 +2,11 @@ import { google } from "@ai-sdk/google";
 import {
   streamText,
   convertToModelMessages,
-  tool,
+  
 } from "ai";
-import { z } from "zod";
-import prisma from "@/lib/prisma";
+
+
+import { getCustomersList, getCustomerByName } from "@/ai/tools/customers";
 
 export const maxDuration = 30;
 
@@ -19,74 +20,88 @@ export async function POST(req: Request) {
       );
 
     const result = streamText({
-      model: google("gemini-2.5-flash"),
+       model: google("gemini-2.5-flash"),
+      onStepFinish(step) {
+  console.log("STEP:");
+  console.dir(step, { depth: null });
+},
 
-      system: `
+onFinish(result) {
+  console.log("FINAL RESULT:");
+  console.dir(result, { depth: null });
+},
+     
+
+     
+system: `
 You are Dairy AI Core.
 
-You help dairy administrators.
+You are connected to the dairy management database.
+
+IMPORTANT RULES:
+
+Whenever a user mentions a person's name,
+ALWAYS check the customer database first.
+
+Examples:
+
+"Tell me about Virat Kohli"
+→ use getCustomerByName
+
+"Show Sachin details"
+→ use getCustomerByName
+
+"What is Rohit's balance?"
+→ use getCustomerByName
+
+"Show all customers"
+→ use getCustomersList
+
+Never assume a person is not a customer.
+Always search the database first.
 
 IMPORTANT:
 
-Whenever a tool returns data:
-
-1. Analyze the tool result.
-2. Generate a human-readable response.
-3. Never stop after tool execution.
-4. Summarize results in a friendly format.
+When using getCustomerByName:
 
 Example:
 
 User:
-Show customers
+"Show Virat Kohli details"
 
-Response:
+Tool Call:
+{
+  "name": "Virat Kohli"
+}
 
-You currently have 4 registered customers:
+User:
+"Tell me about Sachin"
 
-1. Sachin Tendulkar
-   Mobile: 9988776655
-   Balance: ₹516
+Tool Call:
+{
+  "name": "Sachin"
+}
 
-2. Virat Kohli
-   Mobile: 8877665544
-   Balance: ₹1200
-      `,
+Always extract the person's name and pass it to the tool.
+`,
 
       messages: modelMessages,
 
       tools: {
-        getCustomersList: tool({
-          description:
-            "Get all active customers",
-
-          parameters: z.object({}),
-
-          execute: async () => {
-            console.log(
-              "🔥 TOOL CALLED"
-            );
-
-            const customers =
-              await prisma.customer.findMany({
-                where: {
-                  isDeleted: false,
-                },
-                select: {
-                  id: true,
-                  name: true,
-                  mobile: true,
-                  openingBalance: true,
-                },
-              });
-
-            return customers;
-          },
-        }),
+       getCustomersList,
+       getCustomerByName,
       },
 
-      maxSteps: 10,
     });
+
+    console.log("TEXT:");
+console.log(result.text);
+
+console.log("TOOLS:");
+console.dir(
+  result.toolResults,
+  { depth: null }
+);
 
     return result.toUIMessageStreamResponse();
   } catch (error) {
