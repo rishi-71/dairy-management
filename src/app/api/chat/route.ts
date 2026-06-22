@@ -6,7 +6,8 @@ import {
 } from "ai";
 
 
-import { getCustomersList, getCustomerByName } from "@/ai/tools/customers";
+import { getCustomersList, getCustomerByName, getCustomerSubscriptions } from "@/ai/tools/customers";
+import { getDashboardStats } from "@/ai/tools/dashboard";
 
 export const maxDuration = 30;
 
@@ -21,15 +22,15 @@ export async function POST(req: Request) {
 
     const result = streamText({
        model: google("gemini-2.5-flash"),
-      onStepFinish(step) {
-  console.log("STEP:");
-  console.dir(step, { depth: null });
-},
+//       onStepFinish(step) {
+//   console.log("STEP:");
+//   console.dir(step, { depth: null });
+// },
 
-onFinish(result) {
-  console.log("FINAL RESULT:");
-  console.dir(result, { depth: null });
-},
+// onFinish(result) {
+//   console.log("FINAL RESULT:");
+//   console.dir(result, { depth: null });
+// },
      
 
      
@@ -83,25 +84,41 @@ Tool Call:
 }
 
 Always extract the person's name and pass it to the tool.
-`,
+
+If the user asks:
+
+"Show dashboard stats"
+"Dashboard summary"
+"Business summary"
+"Overall statistics"
+"How many customers do I have?"
+"How much outstanding ledger do I have?"
+
+ALWAYS use getDashboardStats.
+Do not answer from general knowledge.
+`
+
+,
 
       messages: modelMessages,
 
       tools: {
        getCustomersList,
        getCustomerByName,
+       getCustomerSubscriptions,
+       getDashboardStats,
       },
 
     });
 
-    console.log("TEXT:");
-console.log(result.text);
+//     console.log("TEXT:");
+// console.log(result.text);
 
-console.log("TOOLS:");
-console.dir(
-  result.toolResults,
-  { depth: null }
-);
+// console.log("TOOLS:");
+// console.dir(
+//   result.toolResults,
+//   { depth: null }
+//);
 
     return result.toUIMessageStreamResponse();
   } catch (error) {

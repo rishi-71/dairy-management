@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import prisma from "@/lib/prisma";
+import { fa } from "zod/locales";
 
 export const getCustomersList = tool({
   description:
@@ -60,5 +61,34 @@ export const getCustomerByName = tool({
     );
 
     return customer;
+  },
+});
+
+export const getCustomerSubscriptions = tool({
+  description:
+    "Get all subscriptions of a customer",
+
+  parameters: z.object({
+    name: z
+      .string()
+      .describe("Customer name"),
+  }),
+
+  execute: async ({ name }) => {
+    const customer =
+      await prisma.customer.findFirst({
+        where: {
+          name: {
+            contains: name,
+          },
+          isDeleted: false,
+        },
+
+        include: {
+          subscriptions: true,
+        },
+      });
+
+    return customer?.subscriptions ?? [];
   },
 });
