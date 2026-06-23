@@ -6,13 +6,37 @@ import { revalidatePath } from "next/cache";
 
 // Pending bills fetch karne ka function
 export async function getPendingBills(customerId: number) {
-  return await prisma.monthlyBill.findMany({
+  const bills = await prisma.monthlyBill.findMany({
     where: { 
       customerId: customerId,
       isPaid: false // Sirf woh bills jo poore pay nahi hue hain
     },
     orderBy: { monthYear: 'desc' }
   });
+
+  // Fetch extra items for each bill month
+  const billsWithExtras = await Promise.all(
+    bills.map(async (bill) => {
+      const [year, month] = bill.monthYear.split('-');
+      const lastDay = new Date(Number(year), Number(month), 0).getDate();
+      const startDate = `${bill.monthYear}-01`;
+      const endDate = `${bill.monthYear}-${lastDay}`;
+
+      const extraItems = await prisma.extraItemLog.findMany({
+        where: {
+          customerId: customerId,
+          dateStr: { gte: startDate, lte: endDate }
+        }
+      });
+
+      return {
+        ...bill,
+        extraItems
+      };
+    })
+  );
+
+  return billsWithExtras;
 }
 
 // Payment save karne ka function

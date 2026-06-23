@@ -2,6 +2,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { syncMonthlyBill } from "@/lib/billUtils";
 
 export async function getMonthlyLedger(customerId: number, yearMonth: string) {
   const [year, month] = yearMonth.split('-');
@@ -78,32 +79,7 @@ export async function updateLedgerDay(customerId: number, dateStr: string, logs:
 
   // 5. AUTO-SYNC MONTHLY BILL
   const monthYear = dateStr.substring(0, 7);
-  const existingBill = await prisma.monthlyBill.findUnique({ where: { customerId_monthYear: { customerId, monthYear } } });
-
-  if (existingBill) {
-    const startDate = `${monthYear}-01`;
-    const lastDay = new Date(Number(monthYear.split('-')[0]), Number(monthYear.split('-')[1]), 0).getDate();
-    const endDate = `${monthYear}-${lastDay}`;
-
-    const monthLogs = await prisma.dailyLog.findMany({ where: { customerId, dateStr: { gte: startDate, lte: endDate } } });
-    const monthExtras = await prisma.extraItemLog.findMany({ where: { customerId, dateStr: { gte: startDate, lte: endDate } } });
-
-    let tMorn = 0, tEve = 0, tMilkAmt = 0, tExtraAmt = 0;
-    
-    monthLogs.forEach((l) => {
-      tMorn += l.morningDelivered; tEve += l.eveningDelivered; tMilkAmt += (l.morningDelivered + l.eveningDelivered) * l.price;
-    });
-    monthExtras.forEach((e) => { tExtraAmt += e.quantity * e.price; });
-
-    await prisma.monthlyBill.update({
-      where: { id: existingBill.id },
-      data: {
-        totalMorningLtrs: tMorn, totalEveningLtrs: tEve,
-        milkTotalAmount: tMilkAmt, extraItemsAmount: tExtraAmt,
-        grandTotal: tMilkAmt + tExtraAmt + existingBill.previousDue
-      }
-    });
-  }
+  await syncMonthlyBill(customerId, monthYear);
 
   return { success: true };
 }

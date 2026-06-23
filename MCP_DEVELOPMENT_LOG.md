@@ -136,3 +136,43 @@ Here is the current list of tool names and their mapped functions:
   3. Added a robust parameter normalization layer at the beginning of `logDailyDelivery` in `src/mcp/tools/daily-log.ts` to map potential parameter aliases (like `item`, `deliveryDate`, `customer`, `morning`, `evening`) to the expected schema fields.
   4. Verified using `scratch_test_chat.ts`, confirming successful execution and response stream mapping.
 
+### [2026-06-23] Feature: Detailed Receipt Generation with Extra Items
+- **Action**: Improved the payment receipt creation flow to produce an itemized paper receipt preview containing milk logs and extra items with quick-print functions.
+- **Why**: Admins need to generate clear, clean, and complete print-ready bills that break down exactly what the customer is paying for (both base milk and extra products).
+- **How**:
+  1. Updated the `getPendingBills` server action in `src/actions/receiptActions.ts` to query and append corresponding `extraItems` from `ExtraItemLog` for the specific month.
+  2. Enhanced `handleSavePayment` and state handling in `src/app/dashboard/receipts/ReceiptClient.tsx` to collect payment dates, mobile numbers, and the itemized lists.
+  3. Replaced the basic success card on the right-hand panel with a styled, minimalist paper receipt showing header, metadata, itemized breakdown (milk log + extra items), total amounts, amount paid, and new outstanding balances.
+  4. Programmed a "Print Receipt" feature that opens a styled, print-only browser window layout and automatically triggers the printer dialog.
+
+### [2026-06-23] Bug Fix: Receipt Preview Disappearing Instantly after Saving
+- **Action**: Prevented the receipt preview from resetting to empty after generating a receipt.
+- **Why**: When clicking "Generate Receipt & Update Balance", the database successfully saved the payment and populated `successData`. However, the code immediately invoked `fetchBills()`, which unconditionally set `successData` to `null` before the browser could render the receipt preview.
+- **How**:
+  1. Updated `fetchBills` in `src/app/dashboard/receipts/ReceiptClient.tsx` to take a boolean parameter `clearSuccess` (defaulting to `true`).
+  2. Modified the conditional check inside `fetchBills` to only call `setSuccessData(null)` if `clearSuccess` is `true`.
+  3. Updated the `handleSavePayment` invocation to call `fetchBills(false)`, which refreshes the billing lists but preserves the newly created `successData` receipt details in the UI.
+
+### [2026-06-23] Feature: Paid Bill Re-opening and Customer Running Balance Auto-adjustment
+- **Action**: Modified `syncMonthlyBill` to automatically re-open fully paid bills and atomically adjust the customer's outstanding balance when ledger entries are edited.
+- **Why**: If an admin edited the customer ledger for a month that was already fully paid (`isPaid: true`), the bill totals would update in the background, but the bill would stay marked as paid. This prevented it from showing up in pending bills on the Receipts page, leaving a gap where new ledger additions were never paid for.
+- **How**:
+  1. Updated `syncMonthlyBill` in `src/lib/billUtils.ts` to compute the outstanding balance difference before and after ledger edits.
+  2. If the new outstanding balance is positive (e.g. we added a ledger entry, so total billed > amount paid), we set `isPaid` to `false` and clear the `paymentDate`.
+  3. Atomically updated the `Customer.openingBalance` (representing their current outstanding balance due) by using Prisma's `increment` set to the delta difference (`outstandingChange`). This ensures additions increase the due balance and deletions decrease it accordingly.
+  4. Verified using the test script `scratch_test_paid_bill_sync.ts`.
+
+### [2026-06-23] Feature: Print Report Option and Clean Invoice Styling
+- **Action**: Renamed the "Print Bill" button to "Print Report" and optimized the printable layout of the monthly bill/invoice.
+- **Why**: The default browser print layout included harsh, heavy black borders (reminiscent of basic Microsoft Word tables) and oversized, boxed total panels which looked cluttered and unpolished.
+- **How**:
+  1. Renamed "Print Bill" to "Print Report" in `src/app/dashboard/reports/ReportGenerator.tsx`.
+  2. Redesigned the printable header to feature a left-aligned clean logo title layout and right-aligned billing month metadata.
+  3. Styled the printable customer card to render inside a clean gray background panel (`print:bg-slate-50`) with slate borders and a "Billed To" helper header.
+  4. Removed all heavy black vertical and horizontal borders (`print:border-black`, `print:border-r`) from the table, replacing them with modern, lightweight slate line separators (`print:border-b print:border-slate-100`).
+  5. Redesigned the "Grand Total to Pay" print panel to display as a compact, neat gray receipt block (`print:bg-slate-50 print:p-4`) with smaller, high-contrast totals (`print:text-2xl`) and added a professional "Thank you for choosing Dairy Farm services!" print footer.
+
+
+
+
+

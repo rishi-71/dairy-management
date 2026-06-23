@@ -3,6 +3,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { syncMonthlyBill } from "@/lib/billUtils";
 
 export async function fetchDailyLog(dateStr: string) {
   const allItems = await prisma.item.findMany({ 
@@ -83,6 +84,13 @@ export async function saveDailyLog(dateStr: string, entries: any[]) {
         }
       }
     }
+  }
+
+  // Auto-sync monthly bills for all affected customers
+  const monthYear = dateStr.substring(0, 7);
+  const customerIds = Array.from(new Set(entries.map(e => Number(e.customerId))));
+  for (const cId of customerIds) {
+    await syncMonthlyBill(cId, monthYear);
   }
 
   revalidatePath("/dashboard/daily-entry");

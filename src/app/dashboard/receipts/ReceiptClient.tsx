@@ -19,15 +19,18 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
 
   useEffect(() => {
     if (selectedCustomerId) {
-      fetchBills();
+      fetchBills(true);
     } else {
       setPendingBills([]);
+      setSuccessData(null);
     }
   }, [selectedCustomerId]);
 
-  const fetchBills = async () => {
+  const fetchBills = async (clearSuccess = true) => {
     setIsLoading(true);
-    setSuccessData(null);
+    if (clearSuccess) {
+      setSuccessData(null);
+    }
     try {
       const bills = await getPendingBills(Number(selectedCustomerId));
       setPendingBills(bills);
@@ -60,16 +63,23 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
         amountPaid: Number(amountPaid)
       });
       
-      const customerName = customers.find(c => c.id === Number(selectedCustomerId))?.name;
+      const customer = customers.find(c => c.id === Number(selectedCustomerId));
       setSuccessData({
         amount: Number(amountPaid),
         remaining: res.remainingAmount,
-        customerName: customerName,
-        month: selectedBill.monthYear
+        customerName: customer?.name || "",
+        customerMobile: customer?.mobile || "",
+        paymentDate: paymentDate,
+        month: new Date(selectedBill.monthYear + "-02").toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        milkTotalAmount: selectedBill.milkTotalAmount,
+        extraItemsAmount: selectedBill.extraItemsAmount,
+        extraItems: selectedBill.extraItems || [],
+        previousDue: selectedBill.previousDue,
+        grandTotal: selectedBill.grandTotal
       });
       
       setAmountPaid("");
-      fetchBills(); // Refresh bills list
+      fetchBills(false); // Refresh bills list but KEEP success data!
     } catch (error) {
       alert("Error saving payment.");
     }
@@ -113,7 +123,7 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
                 <select value={selectedBillId} onChange={(e) => setSelectedBillId(e.target.value)} className="block w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer">
                   {pendingBills.map(b => (
                     <option key={b.id} value={b.id}>
-                      {new Date(b.monthYear).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} Bill
+                      {new Date(b.monthYear + "-02").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} Bill
                     </option>
                   ))}
                 </select>
@@ -163,33 +173,171 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
       {/* RIGHT PANEL (SUCCESS PREVIEW) */}
       <div className="w-full md:w-1/3">
         {successData ? (
-          <div className="bg-white rounded-3xl shadow-xl border border-emerald-100 p-8 text-center animate-in zoom-in slide-in-from-right-8 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500"></div>
-            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+          <div className="bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 text-slate-800 animate-in zoom-in slide-in-from-right-8 relative overflow-hidden flex flex-col justify-between">
+            {/* Top decorative edge */}
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-emerald-500"></div>
+
+            {/* Receipt Paper */}
+            <div id="receipt-paper" className="space-y-4">
+              {/* Logo / Header */}
+              <div className="text-center pb-2">
+                <span className="inline-block p-1 px-3 bg-emerald-50 text-emerald-700 rounded-full font-black text-[10px] uppercase tracking-widest mb-1 border border-emerald-100">
+                  Receipt
+                </span>
+                <h3 className="text-xl font-black text-slate-900 tracking-wider">DAIRY FARM</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Official Payment Voucher</p>
+              </div>
+
+              {/* Receipt Metadata */}
+              <div className="border-t border-b border-dashed border-slate-200 py-3 text-xs space-y-1.5">
+                <div className="flex justify-between font-medium">
+                  <span className="text-slate-400">Date:</span>
+                  <span className="text-slate-800 font-bold">
+                    {new Date(successData.paymentDate).toLocaleDateString('en-US', { dateStyle: 'medium' })}
+                  </span>
+                </div>
+                <div className="flex justify-between font-medium">
+                  <span className="text-slate-400">Customer:</span>
+                  <span className="text-slate-800 font-bold">{successData.customerName}</span>
+                </div>
+                {successData.customerMobile && (
+                  <div className="flex justify-between font-medium">
+                    <span className="text-slate-400">Mobile:</span>
+                    <span className="text-slate-800 font-bold">{successData.customerMobile}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-medium">
+                  <span className="text-slate-400">Bill Period:</span>
+                  <span className="text-slate-800 font-bold">{successData.month}</span>
+                </div>
+              </div>
+
+              {/* Items / Breakdown */}
+              <div className="space-y-2 text-xs">
+                <p className="font-black text-slate-400 uppercase text-[10px] tracking-wider mb-1">Bill Details</p>
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Monthly Milk Log</span>
+                  <span className="font-bold text-slate-800">₹{successData.milkTotalAmount.toFixed(2)}</span>
+                </div>
+
+                {successData.extraItems.length > 0 && (
+                  <div className="pt-1.5 border-t border-slate-100 space-y-1">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase block mb-1">Extra Items</span>
+                    {successData.extraItems.map((item: any, idx: number) => (
+                      <div key={item.id || idx} className="flex justify-between text-slate-600 pl-2">
+                        <span>{item.itemName} (x{item.quantity})</span>
+                        <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {successData.previousDue > 0 && (
+                  <div className="flex justify-between pt-1.5 border-t border-slate-100 text-slate-500">
+                    <span>Previous Outstanding</span>
+                    <span>₹{successData.previousDue.toFixed(2)}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between pt-2 border-t border-slate-200 font-bold text-sm text-slate-900">
+                  <span>Grand Total</span>
+                  <span>₹{successData.grandTotal.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Payment Summary */}
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-500 font-medium">Amount Received</span>
+                  <span className="font-black text-emerald-600 text-sm">₹{successData.amount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs pt-1.5 border-t border-slate-200 border-dashed">
+                  <span className="text-slate-500 font-medium">New Balance Due</span>
+                  <span className="font-black text-rose-600 text-sm">₹{successData.remaining.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="text-center pt-2">
+                <p className="text-[10px] text-slate-400 font-bold italic">Thank you for your business!</p>
+              </div>
             </div>
-            <h3 className="text-2xl font-black text-slate-900 mb-1">Payment Received!</h3>
-            <p className="text-sm font-bold text-slate-500 mb-6">{successData.customerName}</p>
-            
-            <div className="bg-slate-50 rounded-xl p-4 mb-6 text-left space-y-2 border border-slate-200 border-dashed">
-              <div className="flex justify-between">
-                <span className="text-xs font-bold text-slate-400 uppercase">Paid</span>
-                <span className="text-sm font-black text-emerald-600">₹{successData.amount.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs font-bold text-slate-400 uppercase">Bill Month</span>
-                <span className="text-sm font-bold text-slate-700">{successData.month}</span>
-              </div>
-              <hr className="border-slate-200" />
-              <div className="flex justify-between">
-                <span className="text-xs font-black text-slate-500 uppercase">New Balance Due</span>
-                <span className="text-sm font-black text-rose-600">₹{successData.remaining.toFixed(2)}</span>
-              </div>
+
+            {/* Actions */}
+            <div className="mt-6 flex flex-col gap-2">
+              <button 
+                onClick={() => {
+                  const printContent = document.getElementById("receipt-paper")?.innerHTML;
+                  if (printContent) {
+                    const newWin = window.open("", "_blank");
+                    if (newWin) {
+                      newWin.document.write(`
+                        <html>
+                          <head>
+                            <title>Receipt - ${successData.customerName}</title>
+                            <style>
+                              body { font-family: monospace; padding: 40px; color: #333; max-width: 300px; margin: 0 auto; }
+                              .text-center { text-align: center; }
+                              .pb-2 { padding-bottom: 8px; }
+                              .py-3 { padding-top: 12px; padding-bottom: 12px; }
+                              .pt-1 { padding-top: 4px; }
+                              .pt-1.5 { padding-top: 6px; }
+                              .pt-2 { padding-top: 8px; }
+                              .mt-6 { margin-top: 24px; }
+                              .space-y-4 > * + * { margin-top: 16px; }
+                              .space-y-2 > * + * { margin-top: 8px; }
+                              .space-y-1.5 > * + * { margin-top: 6px; }
+                              .space-y-1 > * + * { margin-top: 4px; }
+                              .flex { display: flex; }
+                              .justify-between { justify-content: space-between; }
+                              .border-t { border-top: 1px solid #eee; }
+                              .border-b { border-bottom: 1px solid #eee; }
+                              .border-dashed { border-style: dashed; }
+                              .text-xs { font-size: 12px; }
+                              .text-sm { font-size: 14px; }
+                              .text-xl { font-size: 20px; }
+                              .font-bold { font-weight: bold; }
+                              .font-black { font-weight: 900; }
+                              .font-medium { font-weight: 500; }
+                              .text-slate-400 { color: #888; }
+                              .text-slate-500 { color: #666; }
+                              .text-slate-600 { color: #444; }
+                              .text-slate-800 { color: #222; }
+                              .text-slate-900 { color: #000; }
+                              .bg-slate-50 { background-color: #fafafa; padding: 10px; border-radius: 6px; border: 1px solid #eee; }
+                              .italic { font-style: italic; }
+                              .pl-2 { padding-left: 8px; }
+                              .mb-1 { margin-bottom: 4px; }
+                              .uppercase { text-transform: uppercase; }
+                              .block { display: block; }
+                              .tracking-wider { letter-spacing: 0.05em; }
+                              .tracking-widest { letter-spacing: 0.1em; }
+                              @media print {
+                                body { padding: 0; margin: 0; }
+                              }
+                            </style>
+                          </head>
+                          <body onload="window.print(); window.close();">
+                            <div class="space-y-4">${printContent}</div>
+                          </body>
+                        </html>
+                      `);
+                      newWin.document.close();
+                    }
+                  }
+                }}
+                className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm py-3 px-4 rounded-xl shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                Print Receipt
+              </button>
+              
+              <button 
+                onClick={() => setSuccessData(null)} 
+                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm py-3 px-4 rounded-xl transition-all cursor-pointer"
+              >
+                Record Another Payment
+              </button>
             </div>
-            
-            <button onClick={() => setSuccessData(null)} className="text-sm font-bold text-emerald-600 hover:text-emerald-800">
-              Record another payment
-            </button>
           </div>
         ) : (
           <div className="h-full border-2 border-dashed border-slate-200 rounded-3xl flex items-center justify-center p-8 bg-white/30 backdrop-blur-sm">

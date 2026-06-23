@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { syncMonthlyBill } from "@/lib/billUtils";
 
 export interface LogDailyDeliveryInput {
   customerName: string;
@@ -90,6 +91,10 @@ export async function logDailyDelivery(data: LogDailyDeliveryInput) {
       },
     });
   }
+
+  // Sync the monthly bill if it exists
+  const monthYear = dateStr.substring(0, 7);
+  await syncMonthlyBill(customer.id, monthYear);
 
   return {
     success: true,
