@@ -115,3 +115,25 @@ tool({
     );
   },
 });
+
+export const getLedgerDay = tool({
+  description: "Get delivery entries and extra items for a customer on a particular date. The dateStr must be in YYYY-MM-DD format (e.g. 2026-06-14).",
+
+  parameters: z.object({
+    customerName: z.string().describe("The name of the customer"),
+    dateStr: z.string().describe("The date in YYYY-MM-DD format (e.g. 2026-06-14)"),
+  }),
+
+  execute: async ({
+    customerName,
+    dateStr,
+  }) => {
+    return await callMCP(
+      "getLedgerDay",
+      {
+        customerName,
+        dateStr,
+      }
+    );
+  },
+})

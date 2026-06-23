@@ -55,3 +55,66 @@ export async function getCustomerLedger(
     extraItems,
   };
 }
+
+export async function getLedgerDay(
+  customerName: string,
+  dateStr: string
+) {
+  console.log("CUSTOMER NAME:", customerName);
+  console.log("DATE:", dateStr);
+
+  if (!customerName || !dateStr) {
+    return {
+      error: "Missing customerName or dateStr parameter",
+      logs: [],
+      extras: [],
+    };
+  }
+
+  const customer = await prisma.customer.findFirst({
+    where: {
+      name: {
+        contains: customerName,
+      },
+      isDeleted: false,
+    },
+  });
+
+  if (!customer) {
+    return {
+      error: `Customer '${customerName}' not found`,
+      logs: [],
+      extras: [],
+    };
+  }
+
+  const logs = await prisma.dailyLog.findMany({
+    where: {
+      customerId: customer.id,
+      dateStr: dateStr,
+    },
+    orderBy: {
+      itemName: "asc",
+    },
+  });
+
+  const extras = await prisma.extraItemLog.findMany({
+    where: {
+      customerId: customer.id,
+      dateStr: dateStr,
+    },
+    orderBy: {
+      itemName: "asc",
+    }
+  });
+
+  console.log("LOGS:", logs.length);
+  console.log("EXTRAS:", extras.length);
+
+  return {
+    customerName: customer.name,
+    dateStr,
+    logs,
+    extras,
+  };
+}

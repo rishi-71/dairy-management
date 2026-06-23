@@ -398,95 +398,56 @@ export default function AiAssistant() {
                       );
                     }
 
+                    if (part.type === "tool-getCustomerLedger") {
+                      if (part.state !== "output-available") {
+                        return (
+                          <LoadingTool key={index} text="Loading ledger..." />
+                        );
+                      }
 
-                    if (
-  part.type ===
-  "tool-getCustomerLedger"
-) {
-  if (
-    part.state !==
-    "output-available"
-  ) {
-    return (
-      <LoadingTool
-        key={index}
-        text="Loading ledger..."
-      />
-    );
-  }
+                      const ledger = part.output;
 
-  const ledger =
-    part.output;
+                      return (
+                        <div
+                          key={index}
+                          className="mt-3 bg-white border rounded-xl p-4"
+                        >
+                          <h3 className="font-black mb-3">
+                            📒 Customer Ledger
+                          </h3>
 
-  return (
-    <div
-      key={index}
-      className="mt-3 bg-white border rounded-xl p-4"
-    >
-      <h3 className="font-black mb-3">
-        📒 Customer Ledger
-      </h3>
+                          <div className="mb-4">
+                            <div>
+                              <b>{ledger.customer.name}</b>
+                            </div>
 
-      <div className="mb-4">
-        <div>
-          <b>
-            {
-              ledger.customer
-                .name
-            }
-          </b>
-        </div>
+                            <div>{ledger.customer.mobile}</div>
+                          </div>
 
-        <div>
-          {
-            ledger.customer
-              .mobile
-          }
-        </div>
-      </div>
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {ledger.dailyLogs
+                              ?.slice(0, 10)
+                              .map((log: any, i: number) => (
+                                <div key={i} className="border rounded p-2">
+                                  <div>{log.dateStr}</div>
 
-      <div className="space-y-2 max-h-64 overflow-y-auto">
-        {ledger.dailyLogs
-          ?.slice(0, 10)
-          .map(
-            (
-              log: any,
-              i: number
-            ) => (
-              <div
-                key={i}
-                className="border rounded p-2"
-              >
-                <div>
-                  {log.dateStr}
-                </div>
+                                  <div>{log.itemName}</div>
 
-                <div>
-                  {
-                    log.itemName
-                  }
-                </div>
+                                  <div>
+                                    M:
+                                    {log.morningDelivered}
+                                  </div>
 
-                <div>
-                  M:
-                  {
-                    log.morningDelivered
-                  }
-                </div>
-
-                <div>
-                  E:
-                  {
-                    log.eveningDelivered
-                  }
-                </div>
-              </div>
-            )
-          )}
-      </div>
-    </div>
-  );
-}
+                                  <div>
+                                    E:
+                                    {log.eveningDelivered}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      );
+                    }
 
                     if (part.type === "tool-getOutstandingCustomers") {
                       if (part.state !== "output-available") {
@@ -528,6 +489,101 @@ export default function AiAssistant() {
                               </div>
                             ))}
                           </div>
+                        </div>
+                      );
+                    }
+
+                    if (part.type === "tool-getLedgerDay") {
+                      if (part.state !== "output-available") {
+                        return (
+                          <LoadingTool key={index} text="Loading ledger..." />
+                        );
+                      }
+
+                      const output = part.output;
+
+                      if (output.error) {
+                        return (
+                          <ErrorTool key={index} text={output.error} />
+                        );
+                      }
+
+                      const hasLogs = output.logs && output.logs.length > 0;
+                      const hasExtras = output.extras && output.extras.length > 0;
+
+                      if (!hasLogs && !hasExtras) {
+                        return (
+                          <div
+                            key={index}
+                            className="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-4 text-center text-slate-500 font-bold text-xs"
+                          >
+                            📅 No ledger entries found for <b>{output.customerName || "Customer"}</b> on <b>{output.dateStr}</b>.
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div
+                          key={index}
+                          className="mt-3 bg-slate-50 border border-emerald-100 rounded-xl p-4 shadow-sm w-full"
+                        >
+                          <h3 className="font-black text-emerald-800 border-b border-emerald-100 pb-2 mb-2 flex items-center gap-2">
+                            📅 Ledger Day ({output.dateStr})
+                          </h3>
+                          <div className="text-[10px] font-black text-slate-400 mb-3 uppercase tracking-wider">
+                            Customer: {output.customerName}
+                          </div>
+
+                          {hasLogs && (
+                            <div className="mb-3">
+                              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider mb-1 block">
+                                Milk Entries
+                              </span>
+                              <div className="space-y-1.5">
+                                {output.logs.map((log: any, i: number) => (
+                                  <div
+                                    key={i}
+                                    className="bg-white border border-slate-200 rounded-lg p-2 flex justify-between items-center shadow-sm text-xs font-semibold text-slate-700"
+                                  >
+                                    <span>{log.itemName}</span>
+                                    <div className="flex gap-1.5 font-bold">
+                                      {log.morningDelivered > 0 && (
+                                        <span className="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">
+                                          M: {log.morningDelivered}
+                                        </span>
+                                      )}
+                                      {log.eveningDelivered > 0 && (
+                                        <span className="bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">
+                                          E: {log.eveningDelivered}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {hasExtras && (
+                            <div>
+                              <span className="text-[10px] font-black text-amber-600 uppercase tracking-wider mb-1 block">
+                                Extra Items
+                              </span>
+                              <div className="space-y-1.5">
+                                {output.extras.map((item: any, i: number) => (
+                                  <div
+                                    key={i}
+                                    className="bg-white border border-slate-200 rounded-lg p-2 flex justify-between items-center shadow-sm text-xs font-semibold text-slate-700"
+                                  >
+                                    <span>{item.itemName}</span>
+                                    <span className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-bold">
+                                      Qty: {item.quantity}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     }

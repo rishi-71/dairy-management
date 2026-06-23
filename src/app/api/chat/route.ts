@@ -13,6 +13,9 @@ import {
  createCustomer,
  updateCustomer,
  getCustomerLedger,
+ getLedgerDay,
+ 
+
 } from "@/ai/tools/mcpTools";
 //import { getDashboardStats } from "@/mcp/tools/dashboard";
 //import { getOutstandingCustomers } from "@/mcp/tools/billing";
@@ -146,6 +149,15 @@ What was delivered to Sachin
 Use:
 
 getCustomerLedger
+
+If the user asks:
+
+- What was delivered on a date
+- Show ledger for a day
+- Show entries for a day
+- What products were supplied on a date
+
+Use getLedgerDay. You MUST convert any relative or absolute dates mentioned by the user (like "14 june", "today", "yesterday") into the "YYYY-MM-DD" format relative to the current local time. Supply the customerName (e.g. "Sachin") and the formatted date.
 `
 
 ,
@@ -159,6 +171,7 @@ getCustomerLedger
        createCustomer,
        updateCustomer,
        getCustomerLedger,
+       getLedgerDay,
       },
 
       toolChoice: "auto",

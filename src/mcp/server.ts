@@ -11,7 +11,7 @@ import { getCustomersList, getCustomerByName } from "./tools/customers";
 
 import { getDashboardStats } from "./tools/dashboard";
 
-import { getCustomerLedger } from "./tools/ledger";
+import { getCustomerLedger, getLedgerDay } from "./tools/ledger";
 
 const app = express();
 
@@ -40,6 +40,14 @@ app.post("/mcp", async (req, res) => {
 
        case "getCustomerLedger":
         return res.json( await getCustomerLedger( args.customerName));
+
+        case "getLedgerDay":
+  return res.json(
+    await getLedgerDay(
+      args.customerName,
+      args.dateStr
+    )
+  );
 
       default:
         return res.status(404).json({
