@@ -12,6 +12,7 @@ import { getCustomersList, getCustomerByName } from "./tools/customers";
 import { getDashboardStats } from "./tools/dashboard";
 
 import { getCustomerLedger, getLedgerDay } from "./tools/ledger";
+import { logDailyDelivery } from "./tools/daily-log";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.post("/mcp", async (req, res) => {
   try {
     const { tool, args } = req.body;
+    console.log("📥 MCP SERVER RECEIVED:", { tool, args });
 
     switch (tool) {
       case "getCustomersList":
@@ -49,6 +51,11 @@ app.post("/mcp", async (req, res) => {
     )
   );
 
+        case "logDailyDelivery":
+  return res.json(
+    await logDailyDelivery(args)
+  );
+
       default:
         return res.status(404).json({
           error: "Tool not found",
@@ -63,6 +70,7 @@ app.post("/mcp", async (req, res) => {
   }
 });
 
-app.listen(3001, () => {
-  console.log("🚀 MCP Server running on port 3001");
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`🚀 MCP Server running on port ${PORT}`);
 });

@@ -136,4 +136,20 @@ export const getLedgerDay = tool({
       }
     );
   },
-})
+});
+
+export const logDailyDelivery = tool({
+  description: "Log or modify a daily delivery entry (morning/evening milk quantity) for a customer on a particular date. If a log exists for this customer/date/item, it updates it, otherwise it creates a new entry.",
+
+  parameters: z.object({
+    customerName: z.string().describe("The name of the customer. DO NOT use 'customer', you must use 'customerName'"),
+    itemName: z.string().describe("The name of the milk item, e.g. 'Cow Milk' or 'Buffalo Milk'. DO NOT use 'item', you must use 'itemName'"),
+    dateStr: z.string().describe("The date in YYYY-MM-DD format (e.g. 2026-06-14). DO NOT use 'deliveryDate' or 'date', you must use 'dateStr'"),
+    morningDelivered: z.number().optional().describe("Quantity delivered in the morning (in liters). DO NOT use 'morning', you must use 'morningDelivered'"),
+    eveningDelivered: z.number().optional().describe("Quantity delivered in the evening (in liters). DO NOT use 'evening', you must use 'eveningDelivered'"),
+  }),
+
+  execute: async (input) => {
+    return await callMCP("logDailyDelivery", input);
+  },
+});

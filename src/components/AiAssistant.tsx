@@ -588,6 +588,61 @@ export default function AiAssistant() {
                       );
                     }
 
+                    if (part.type === "tool-logDailyDelivery") {
+                      if (part.state !== "output-available") {
+                        return (
+                          <LoadingTool key={index} text="Logging delivery..." />
+                        );
+                      }
+
+                      const output = part.output;
+
+                      if (!output.success) {
+                        return (
+                          <ErrorTool key={index} text={output.error || "Failed to log delivery"} />
+                        );
+                      }
+
+                      const log = output.log;
+
+                      return (
+                        <div
+                          key={index}
+                          className="mt-3 bg-emerald-50 border border-emerald-300 rounded-xl p-4 shadow-sm w-full animate-in zoom-in-95 duration-200"
+                        >
+                          <h3 className="font-black text-emerald-800 flex items-center gap-2 mb-2">
+                            ✅ {output.message}
+                          </h3>
+                          <div className="text-sm bg-white p-3 rounded-lg border border-emerald-100 space-y-1.5 font-semibold text-slate-700">
+                            <p>
+                              <span className="text-slate-400 text-xs font-bold inline-block w-20">Customer:</span>
+                              <span className="text-slate-800">{log.customerName}</span>
+                            </p>
+                            <p>
+                              <span className="text-slate-400 text-xs font-bold inline-block w-20">Product:</span>
+                              <span className="text-slate-800">{log.itemName}</span>
+                            </p>
+                            <p>
+                              <span className="text-slate-400 text-xs font-bold inline-block w-20">Date:</span>
+                              <span className="text-slate-800">{log.dateStr}</span>
+                            </p>
+                            <p>
+                              <span className="text-slate-400 text-xs font-bold inline-block w-20">Morning:</span>
+                              <span className={log.morningDelivered > 0 ? "text-amber-600 font-bold" : "text-slate-500"}>
+                                {log.morningDelivered} Liters
+                              </span>
+                            </p>
+                            <p>
+                              <span className="text-slate-400 text-xs font-bold inline-block w-20">Evening:</span>
+                              <span className={log.eveningDelivered > 0 ? "text-indigo-600 font-bold" : "text-slate-500"}>
+                                {log.eveningDelivered} Liters
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+
                     return null;
                   })}
                 </div>

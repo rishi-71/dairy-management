@@ -14,8 +14,7 @@ import {
  updateCustomer,
  getCustomerLedger,
  getLedgerDay,
- 
-
+ logDailyDelivery,
 } from "@/ai/tools/mcpTools";
 //import { getDashboardStats } from "@/mcp/tools/dashboard";
 //import { getOutstandingCustomers } from "@/mcp/tools/billing";
@@ -158,6 +157,28 @@ If the user asks:
 - What products were supplied on a date
 
 Use getLedgerDay. You MUST convert any relative or absolute dates mentioned by the user (like "14 june", "today", "yesterday") into the "YYYY-MM-DD" format relative to the current local time. Supply the customerName (e.g. "Sachin") and the formatted date.
+
+ADD ENTRY RULES
+
+If the user asks to add or modify a daily log entry (e.g., "add 1.5 litre of cow milk for Virat on 14 June", "record 2L buffalo milk delivery for Rohit today"):
+- Use logDailyDelivery.
+- Map the quantity to morningDelivered or eveningDelivered. If morning/evening is not specified, default to morningDelivered and set eveningDelivered to 0.
+- Convert any relative or absolute dates mentioned by the user (like "14 june", "today", "yesterday") into "YYYY-MM-DD" format relative to current local time.
+- Identify the item (e.g., "Cow Milk", "Buffalo Milk").
+
+Tool Call Structure Example:
+If user says: "add 2 litre of buffalo milk for Virat Kohli for date 17 June 2026"
+Use:
+logDailyDelivery
+{
+  "customerName": "Virat Kohli",
+  "itemName": "Buffalo Milk",
+  "dateStr": "2026-06-17",
+  "morningDelivered": 2,
+  "eveningDelivered": 0
+}
+
+Note: You MUST use the exact parameter names 'customerName', 'itemName', 'dateStr', 'morningDelivered', and 'eveningDelivered'. DO NOT use 'customer', 'item', 'deliveryDate', 'date', 'morning', or 'evening'.
 `
 
 ,
@@ -172,6 +193,7 @@ Use getLedgerDay. You MUST convert any relative or absolute dates mentioned by t
        updateCustomer,
        getCustomerLedger,
        getLedgerDay,
+       logDailyDelivery,
       },
 
       toolChoice: "auto",

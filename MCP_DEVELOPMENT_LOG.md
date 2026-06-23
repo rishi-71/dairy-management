@@ -98,6 +98,7 @@ Here is the current list of tool names and their mapped functions:
 | `updateCustomer` | Update customer phone number, address, or opening balance | `updateCustomer(data)` in `src/mcp/tools/customer-update.ts` |
 | `getCustomerLedger` | Get ledger logs (deliveries & extra items) of a customer | `getCustomerLedger(customerName)` in `src/mcp/tools/ledger.ts` |
 | `getLedgerDay` | Get delivery entries for a specific customer and date | `getLedgerDay(customerName, dateStr)` in `src/mcp/tools/ledger.ts` |
+| `logDailyDelivery` | Log or modify a daily delivery entry (morning/evening milk quantity) | `logDailyDelivery(data)` in `src/mcp/tools/daily-log.ts` |
 
 ---
 
@@ -116,3 +117,22 @@ Here is the current list of tool names and their mapped functions:
   2. Updated Express routing (`src/mcp/server.ts`) and AI tool registration (`src/ai/tools/mcpTools.ts`) to forward `customerName`.
   3. Added explicit system instructions in `src/app/api/chat/route.ts` to guide Gemini to convert queries (like "14 June") into `YYYY-MM-DD` format.
   4. Redesigned the renderer in `src/components/AiAssistant.tsx` to handle customer-not-found errors, empty states ("no entries found"), and style matching records inside clean, distinct layouts.
+
+### [2026-06-23] Feature: Add/Modify Daily Delivery Entry (logDailyDelivery)
+- **Action**: Built a new MCP tool `logDailyDelivery` to create or modify milk delivery logs for any customer and date.
+- **Why**: Admins need to be able to dynamically log or correct daily milk quantities directly from the chatbot dialog without leaving the chat interface.
+- **How**:
+  1. Created `src/mcp/tools/daily-log.ts` implementing `logDailyDelivery(data)` which performs a Prisma `upsert` (create/update) for `DailyLog` based on `customerName`, `itemName`, and `dateStr`.
+  2. Registered the tool case on the Express server (`src/mcp/server.ts`) and exported the Vercel AI SDK wrapper (`src/ai/tools/mcpTools.ts`).
+  3. Configured system parsing rules in `src/app/api/chat/route.ts` so the model extracts quantity (morning/evening), maps item names, and formats dates into `YYYY-MM-DD`.
+  4. Programmed a responsive green confirmation layout inside `src/components/AiAssistant.tsx` displaying the customer, item, date, and updated morning/evening totals.
+
+### [2026-06-23] Bug Fix: Parameter Hallucination in logDailyDelivery Tool Call
+- **Action**: Resolved parameter alignment errors where the AI model sent `item` and `deliveryDate` instead of the schema-defined `itemName` and `dateStr`.
+- **Why**: When invoking `logDailyDelivery` through the frontend chat assistant, the LLM hallucinated parameter keys, causing Express schema validation to fail on missing required fields.
+- **How**:
+  1. Updated the Zod schema description in `src/ai/tools/mcpTools.ts` to include explicit warnings against using parameter aliases.
+  2. Modified system prompt instructions in `src/app/api/chat/route.ts` with a concrete example of a tool call structure and explicit warnings not to use alternative parameter names.
+  3. Added a robust parameter normalization layer at the beginning of `logDailyDelivery` in `src/mcp/tools/daily-log.ts` to map potential parameter aliases (like `item`, `deliveryDate`, `customer`, `morning`, `evening`) to the expected schema fields.
+  4. Verified using `scratch_test_chat.ts`, confirming successful execution and response stream mapping.
+
