@@ -6,7 +6,7 @@ export const getCustomersList = tool({
   description:
     "Get all active customers",
 
-  parameters: z.object({}),
+  inputSchema: z.object({}),
 
   execute: async () => {
     return await callMCP(
@@ -19,7 +19,7 @@ export const getCustomerByName = tool({
   description:
     "Find customer by name",
 
-  parameters: z.object({
+  inputSchema: z.object({
     name: z.string(),
   }),
 
@@ -37,7 +37,7 @@ export const getDashboardStats = tool({
   description:
     "Get dashboard statistics",
 
-  parameters: z.object({}),
+  inputSchema: z.object({}),
 
   execute: async () => {
     return await callMCP(
@@ -50,7 +50,7 @@ export const createCustomer = tool({
   description:
     "Create a new dairy customer",
 
-  parameters: z.object({
+  inputSchema: z.object({
     name: z.string(),
     mobile: z.string(),
     address: z.string(),
@@ -72,7 +72,7 @@ export const updateCustomer = tool({
   description:
     "Update customer mobile, address or balance",
 
-  parameters: z.object({
+  inputSchema: z.object({
     customerName:
       z.string(),
 
@@ -99,7 +99,7 @@ tool({
   description:
     "Get full ledger of a customer",
 
-  parameters: z.object({
+  inputSchema: z.object({
     customerName:
       z.string(),
   }),
@@ -119,7 +119,7 @@ tool({
 export const getLedgerDay = tool({
   description: "Get delivery entries and extra items for a customer on a particular date. The dateStr must be in YYYY-MM-DD format (e.g. 2026-06-14).",
 
-  parameters: z.object({
+  inputSchema: z.object({
     customerName: z.string().describe("The name of the customer"),
     dateStr: z.string().describe("The date in YYYY-MM-DD format (e.g. 2026-06-14)"),
   }),
@@ -141,7 +141,7 @@ export const getLedgerDay = tool({
 export const logDailyDelivery = tool({
   description: "Log or modify a daily delivery entry (morning/evening milk quantity) for a customer on a particular date. If a log exists for this customer/date/item, it updates it, otherwise it creates a new entry.",
 
-  parameters: z.object({
+  inputSchema: z.object({
     customerName: z.string().describe("The name of the customer. DO NOT use 'customer', you must use 'customerName'"),
     itemName: z.string().describe("The name of the milk item, e.g. 'Cow Milk' or 'Buffalo Milk'. DO NOT use 'item', you must use 'itemName'"),
     dateStr: z.string().describe("The date in YYYY-MM-DD format (e.g. 2026-06-14). DO NOT use 'deliveryDate' or 'date', you must use 'dateStr'"),

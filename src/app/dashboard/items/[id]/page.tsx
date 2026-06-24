@@ -10,7 +10,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
   if (!item) return notFound();
 
   // FIX: Changed item._id to item.id for MySQL/Prisma compliance
-  const updateItemWithId = updateItem.bind(null, item.id);
+  const updateItemWithId = updateItem.bind(null, item.id.toString());
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 via-slate-50 to-teal-100 px-4 py-12 sm:px-6 lg:px-8">

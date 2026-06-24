@@ -3,6 +3,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 
 export default function AiAssistant() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +11,9 @@ export default function AiAssistant() {
 
   // 🚀 AAPKI LOGIC: Vercel AI Chat Hook
   const chat = useChat({
-    api: "/api/chat",
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+    })
   });
 
   // 🚀 AAPKI LOGIC: Custom Input State
@@ -30,13 +33,8 @@ export default function AiAssistant() {
     if (e) e.preventDefault();
     if (!input.trim()) return;
 
-    // Safety check: Vercel AI SDK usually uses `append`, but maintaining your logic structure safely
     try {
-      if (chat.append) {
-        await chat.append({ role: "user", content: input.trim() });
-      } else if ((chat as any).sendMessage) {
-        await (chat as any).sendMessage({ text: input.trim() });
-      }
+      await chat.sendMessage({ text: input.trim() });
     } catch (err) {
       console.error("Failed to send:", err);
     }
@@ -48,9 +46,9 @@ export default function AiAssistant() {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {/* 🚀 BEAUTIFUL CHAT WINDOW */}
       {isOpen && (
-        <div className="mb-4 w-[350px] sm:w-[420px] h-[600px] bg-slate-50 rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-300">
+        <div className="mb-4 w-[350px] sm:w-[420px] h-[600px] bg-white/70 dark:bg-slate-900/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] border border-white/60 dark:border-slate-800/60 overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-300">
           {/* HEADER */}
-          <div className="bg-slate-900 p-4 flex justify-between items-center text-white shadow-md z-10">
+          <div className="bg-slate-900/90 backdrop-blur-md p-4 flex justify-between items-center text-white shadow-md z-10 border-b border-white/10 dark:border-slate-800/20">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center animate-pulse shadow-[0_0_15px_rgba(52,211,153,0.5)]">
                 <span className="text-lg">🥛</span>
@@ -94,7 +92,7 @@ export default function AiAssistant() {
             {/* Welcome Message */}
             {chat.messages.length === 0 && (
               <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl p-4 text-sm font-semibold shadow-sm bg-white text-slate-700 border border-slate-200 rounded-tl-sm">
+                <div className="max-w-[85%] rounded-2xl p-4 text-sm font-semibold shadow-[0_4px_12px_rgba(0,0,0,0.02)] bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm text-slate-700 dark:text-slate-300 border border-white/80 dark:border-slate-800/50 rounded-tl-sm">
                   Hello Admin! 👋 I am ready to fetch data from your database.
                 </div>
               </div>
@@ -102,7 +100,7 @@ export default function AiAssistant() {
 
             {/* Error Message */}
             {chat.error && (
-              <div className="bg-rose-100 border border-rose-200 text-rose-800 p-4 rounded-2xl font-bold text-xs shadow-sm">
+              <div className="bg-rose-50/80 dark:bg-rose-950/20 backdrop-blur-sm border border-rose-100 dark:border-rose-900/30 text-rose-800 dark:text-rose-400 p-4 rounded-2xl font-bold text-xs shadow-sm">
                 🚨 {chat.error.message}
               </div>
             )}
@@ -114,7 +112,7 @@ export default function AiAssistant() {
                 className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
               >
                 <div
-                  className={`max-w-[90%] rounded-2xl p-4 text-sm shadow-sm ${msg.role === "user" ? "bg-emerald-600 text-white font-medium rounded-br-sm" : "bg-white text-slate-700 border border-slate-200 rounded-tl-sm"}`}
+                  className={`max-w-[90%] rounded-2xl p-4 text-sm shadow-sm ${msg.role === "user" ? "bg-gradient-to-tr from-emerald-600 to-teal-600 text-white font-medium rounded-br-sm shadow-[0_4px_12px_rgba(16,185,129,0.15)]" : "bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm text-slate-700 dark:text-slate-355 border border-white/80 dark:border-slate-800/50 rounded-tl-sm shadow-[0_4px_12px_rgba(0,0,0,0.02)]"}`}
                 >
                   {msg.parts?.map((part: any, index: number) => {
                     // 1. STANDARD TEXT
@@ -652,7 +650,7 @@ export default function AiAssistant() {
             {/* Waiting for AI response indicator */}
             {chat.status === "submitted" && (
               <div className="flex justify-start">
-                <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 shadow-sm flex items-center gap-1.5">
+                <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl rounded-tl-sm p-4 shadow-sm flex items-center gap-1.5">
                   <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></span>
                   <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-75"></span>
                   <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-150"></span>
@@ -663,7 +661,7 @@ export default function AiAssistant() {
           </div>
 
           {/* 🚀 AAPKI LOGIC: Input Area wrapped in UI */}
-          <div className="p-4 bg-white border-t border-slate-100">
+          <div className="p-4 bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-t border-white/50 dark:border-slate-800/40">
             <div className="relative flex items-center">
               <input
                 type="text"
@@ -679,12 +677,12 @@ export default function AiAssistant() {
                 disabled={
                   chat.status === "submitted" || chat.status === "streaming"
                 }
-                className="w-full bg-slate-100 text-slate-800 font-bold text-sm rounded-xl py-3.5 pl-4 pr-12 outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50 transition-all"
+                className="w-full bg-white/60 dark:bg-slate-950/60 text-slate-800 dark:text-slate-150 border border-slate-200/50 dark:border-slate-800/50 font-bold text-sm rounded-xl py-3.5 pl-4 pr-12 outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white dark:focus:bg-slate-950 disabled:opacity-50 transition-all shadow-inner"
               />
               <button
                 onClick={sendMessage}
                 disabled={!input.trim() || chat.status === "submitted"}
-                className="absolute right-2 p-2 bg-emerald-600 text-white rounded-lg disabled:opacity-50 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all shadow-md"
+                className="absolute right-2 p-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg disabled:opacity-50 hover:from-emerald-700 hover:to-teal-700 hover:-translate-y-0.5 transition-all shadow-md"
               >
                 <svg
                   className="w-4 h-4"
@@ -708,7 +706,7 @@ export default function AiAssistant() {
       {/* FLOATING TOGGLE BUTTON */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-16 h-16 rounded-full shadow-[0_10px_25px_rgba(16,185,129,0.4)] flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 z-50 relative ${isOpen ? "bg-slate-800 rotate-90 shadow-slate-900/40" : "bg-gradient-to-r from-emerald-500 to-teal-600"}`}
+        className={`w-16 h-16 rounded-full shadow-[0_10px_25px_rgba(16,185,129,0.3)] flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 active:scale-95 z-50 relative ${isOpen ? "bg-slate-800 rotate-90 shadow-slate-900/40" : "bg-gradient-to-tr from-emerald-500 via-emerald-600 to-teal-600"}`}
       >
         {isOpen ? (
           <svg
@@ -735,7 +733,7 @@ export default function AiAssistant() {
 // 🚀 Helper Components for clean UI
 function LoadingTool({ text }: { text: string }) {
   return (
-    <div className="mt-3 text-xs text-slate-400 font-bold flex items-center gap-2 animate-pulse bg-slate-50 p-3 rounded-lg border border-slate-100">
+    <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 font-bold flex items-center gap-2 animate-pulse bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-sm p-3 rounded-xl border border-emerald-100/50 dark:border-emerald-900/30 shadow-sm">
       <svg
         className="w-4 h-4 animate-spin text-emerald-500"
         fill="none"
@@ -756,7 +754,7 @@ function LoadingTool({ text }: { text: string }) {
 
 function ErrorTool({ text }: { text: string }) {
   return (
-    <div className="mt-3 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-3 rounded-lg flex items-center gap-2">
+    <div className="mt-3 text-xs font-bold text-rose-700 dark:text-rose-450 bg-rose-50/80 dark:bg-rose-950/20 backdrop-blur-sm border border-rose-100 dark:border-rose-900/30 p-3 rounded-xl shadow-sm flex items-center gap-2">
       <svg
         className="w-4 h-4"
         fill="none"

@@ -89,8 +89,8 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
   return (
     <div className="flex flex-col md:flex-row gap-6">
       {/* LEFT FORM PANEL */}
-      <div className="w-full md:w-2/3 rounded-3xl border border-slate-200/60 bg-white shadow-xl overflow-hidden relative z-10 animate-in fade-in slide-in-from-bottom-4">
-        <div className="bg-slate-800 text-white p-6">
+      <div className="w-full md:w-2/3 rounded-3xl border border-white/40 bg-white/40 backdrop-blur-3xl shadow-xl shadow-slate-100/35 overflow-hidden relative z-10 animate-in fade-in slide-in-from-bottom-4">
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 border-b border-white/10">
           <h2 className="text-xl font-black tracking-widest uppercase">New Receipt Entry</h2>
         </div>
         
@@ -98,29 +98,29 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-bold text-slate-600 mb-2">1. Select Customer</label>
-              <select value={selectedCustomerId} onChange={(e) => setSelectedCustomerId(e.target.value)} className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer">
+              <select value={selectedCustomerId} onChange={(e) => setSelectedCustomerId(e.target.value)} className="block w-full rounded-xl border border-slate-200/60 bg-white/60 px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white cursor-pointer transition-all duration-200">
                 <option value="" disabled>-- Choose Customer --</option>
                 {customers.map(c => <option key={c.id} value={c.id}>{c.name} ({c.mobile})</option>)}
               </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-600 mb-2">2. Payment Date</label>
-              <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer" />
+              <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="block w-full rounded-xl border border-slate-200/60 bg-white/60 px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white cursor-pointer transition-all duration-200" />
             </div>
           </div>
 
           {isLoading ? (
             <div className="p-4 text-center font-bold text-slate-400 animate-pulse">Checking pending bills...</div>
           ) : selectedCustomerId && pendingBills.length === 0 ? (
-            <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
+            <div className="p-6 bg-emerald-50/60 backdrop-blur-sm rounded-2xl border border-emerald-100/50 text-center shadow-sm">
               <span className="text-2xl mb-2 block">🎉</span>
               <p className="text-emerald-800 font-bold">No pending bills for this customer!</p>
             </div>
           ) : selectedCustomerId && pendingBills.length > 0 && (
             <div className="space-y-6 animate-in zoom-in-95 duration-300">
-              <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl">
+              <div className="p-5 bg-white/60 border border-slate-200/40 rounded-2xl shadow-sm">
                 <label className="block text-sm font-bold text-slate-600 mb-2">3. Select Pending Bill</label>
-                <select value={selectedBillId} onChange={(e) => setSelectedBillId(e.target.value)} className="block w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer">
+                <select value={selectedBillId} onChange={(e) => setSelectedBillId(e.target.value)} className="block w-full rounded-xl border border-slate-200/50 bg-white px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer">
                   {pendingBills.map(b => (
                     <option key={b.id} value={b.id}>
                       {new Date(b.monthYear + "-02").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} Bill
@@ -130,9 +130,9 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-6">
-                <div className="flex-1 bg-amber-50 border border-amber-200 p-6 rounded-2xl">
+                <div className="flex-1 bg-amber-50/80 backdrop-blur-sm border border-amber-200/30 p-6 rounded-2xl shadow-sm">
                   <p className="text-xs font-black uppercase tracking-widest text-amber-600/70 mb-1">Total Outstanding</p>
-                  <p className="text-3xl font-black text-amber-900">₹{currentOutstanding.toFixed(2)}</p>
+                  <p className="text-3xl font-black text-amber-850">₹{currentOutstanding.toFixed(2)}</p>
                 </div>
                 
                 <div className="flex-1 relative">
@@ -145,15 +145,15 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
                       value={amountPaid} 
                       onChange={(e) => setAmountPaid(parseFloat(e.target.value) || "")}
                       placeholder="0.00"
-                      className="block w-full rounded-2xl border-2 border-emerald-200 bg-white pl-10 pr-4 py-4 text-3xl font-black text-slate-900 focus:outline-none focus:border-emerald-500 shadow-sm"
+                      className="block w-full rounded-2xl border-2 border-emerald-200/60 bg-white/80 pl-10 pr-4 py-4 text-3xl font-black text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-md focus:shadow-emerald-500/5"
                     />
                   </div>
                 </div>
               </div>
 
               {amountPaid !== "" && (
-                <div className="p-4 bg-slate-800 rounded-xl flex justify-between items-center text-white">
-                  <span className="text-sm font-bold text-slate-300 uppercase tracking-widest">Calculated Balance Due:</span>
+                <div className="p-4 bg-slate-800 rounded-xl flex justify-between items-center text-white shadow-sm">
+                  <span className="text-sm font-bold text-slate-350 uppercase tracking-widest">Calculated Balance Due:</span>
                   <span className="text-xl font-black">₹{remainingAfterPayment.toFixed(2)}</span>
                 </div>
               )}
@@ -161,7 +161,7 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
               <button 
                 onClick={handleSavePayment} 
                 disabled={isSaving || !amountPaid} 
-                className="w-full bg-emerald-600 text-white font-black text-lg py-4 rounded-xl shadow-lg hover:bg-emerald-700 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none flex justify-center items-center gap-2"
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-lg py-4 rounded-xl shadow-lg shadow-emerald-650/10 hover:from-emerald-700 hover:to-teal-700 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none flex justify-center items-center gap-2"
               >
                 {isSaving ? "Saving..." : "Generate Receipt & Update Balance"}
               </button>
@@ -173,7 +173,7 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
       {/* RIGHT PANEL (SUCCESS PREVIEW) */}
       <div className="w-full md:w-1/3">
         {successData ? (
-          <div className="bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 text-slate-800 animate-in zoom-in slide-in-from-right-8 relative overflow-hidden flex flex-col justify-between">
+          <div className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-xl border border-white/60 p-6 text-slate-800 animate-in zoom-in slide-in-from-right-8 relative overflow-hidden flex flex-col justify-between">
             {/* Top decorative edge */}
             <div className="absolute top-0 left-0 w-full h-1.5 bg-emerald-500"></div>
 
@@ -325,7 +325,7 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
                     }
                   }
                 }}
-                className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm py-3 px-4 rounded-xl shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:shadow-md text-white font-bold text-sm py-3 px-4 rounded-xl shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                 Print Receipt
@@ -340,7 +340,7 @@ export default function ReceiptClient({ customers }: { customers: any[] }) {
             </div>
           </div>
         ) : (
-          <div className="h-full border-2 border-dashed border-slate-200 rounded-3xl flex items-center justify-center p-8 bg-white/30 backdrop-blur-sm">
+          <div className="h-full border-2 border-dashed border-slate-200/50 rounded-3xl flex items-center justify-center p-8 bg-white/20 backdrop-blur-sm min-h-[300px]">
              <p className="text-slate-400 font-bold text-center">Receipt preview will appear here after saving.</p>
           </div>
         )}

@@ -6,7 +6,7 @@ export const getOutstandingCustomers = tool({
   description:
     "Get customers with unpaid bills and outstanding balances",
 
-  parameters: z.object({}),
+  inputSchema: z.object({}),
 
   execute: async () => {
     console.log("🔥 getOutstandingCustomers CALLED");

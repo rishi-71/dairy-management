@@ -172,7 +172,17 @@ Here is the current list of tool names and their mapped functions:
   4. Removed all heavy black vertical and horizontal borders (`print:border-black`, `print:border-r`) from the table, replacing them with modern, lightweight slate line separators (`print:border-b print:border-slate-100`).
   5. Redesigned the "Grand Total to Pay" print panel to display as a compact, neat gray receipt block (`print:bg-slate-50 print:p-4`) with smaller, high-contrast totals (`print:text-2xl`) and added a professional "Thank you for choosing Dairy Farm services!" print footer.
 
-
-
-
-
+### [2026-06-23] UI/UX Redesign & Premium Styling Refactor
+- **Action**: Conducted a comprehensive visual redesign across all main panels (layout, sidebar, KPI stats, charts, tables, receipt generation form, and AI chatbot assistant).
+- **Why**: Needed to elevate the visual aesthetic of the platform to a modern, premium enterprise design (using glassmorphism, dynamic gradients, soft shadows, rounded shapes, and clean transitions) while strictly keeping all state logic, props, Prisma schemas, and business logic intact.
+- **How**:
+  1. **Global Typography**: Updated `src/app/globals.css` to fall back to Next.js's premium `Geist Sans` font instead of generic browser default Arial, upgrading typography across the entire app.
+  2. **Frosted Glass Sidebar & Layout**: Refactored `src/app/dashboard/layout.tsx` and `src/app/dashboard/SidebarNav.tsx` to use rich glassmorphism wrappers (`bg-white/40 backdrop-blur-3xl border-white/40 shadow-[0_8px_32px_0_rgba(148,163,184,0.08)]`), group-hover animations, micro-lifts, and translation slide-ins on sidebar links.
+  3. **KPI & Metrics Overhaul**: Enhanced `src/app/dashboard/DashboardStats.tsx` with dynamic hover scale and shadow transitions, distinct hover glow borders (emerald, teal, blue, rose), and updated the CSS-based product distribution chart with gradient progress fills (`from-emerald-500 via-teal-500 to-cyan-500`) and glow dropshadows.
+  4. **AI Chatbot Revamp**: Upgraded `src/components/AiAssistant.tsx` to a floating frosted-glass chat card (`bg-white/70 backdrop-blur-2xl border-white/60 shadow-2xl`), redesigned the user message bubble as an emerald gradient pill (`bg-gradient-to-tr from-emerald-600 to-teal-600`), and styled the floating toggle trigger with interactive scale/bounce animations.
+  5. **Data Tables & Modals Polish**: Redesigned `src/app/dashboard/customers/[id]/ledger/LedgerClient.tsx`, `src/app/dashboard/receipts/ReceiptClient.tsx`, and `src/app/dashboard/reports/ReportGenerator.tsx` to use soft glass cards, lightweight borders, clean hover highlights (`hover:bg-white/70`), and converted modal overlay panels to use frosted glass backdrops (`backdrop-blur-md`).
+  6. **TypeScript & Vercel AI SDK v6 Compatibility Fixes**:
+     - Upgraded all tool options in `src/ai/tools/mcpTools.ts` and `src/mcp/tools/billing.ts` to replace deprecated `parameters` with the newer `inputSchema` property.
+     - Updated `AiAssistant.tsx` to construct and pass `DefaultChatTransport` to `useChat()` and call `chat.sendMessage` directly to align with v6 API changes.
+     - Fixed argument type mismatch in `src/app/dashboard/items/[id]/page.tsx` by stringifying the numeric item ID.
+     - Verified that the full Next.js production build (`npm run build`) compiles successfully.

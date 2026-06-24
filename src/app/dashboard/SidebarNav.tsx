@@ -67,7 +67,7 @@ export default function SidebarNav() {
   ];
 
   return (
-    <nav className="space-y-2">
+    <nav className="space-y-1.5">
       {navItems.map((item) => {
         // Dashboard ke liye exact match chahiye, baki sabke liye startsWith() taaki sub-pages (edit pages) par bhi highlight rahe
         const isActive = item.href === "/dashboard" 
@@ -78,13 +78,13 @@ export default function SidebarNav() {
           <Link 
             key={item.name} 
             href={item.href} 
-            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all border ${
+            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 border transform group ${
               isActive 
-                ? "bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 text-emerald-800 font-black shadow-sm" 
-                : "border-transparent text-slate-600 font-bold hover:bg-white/80 hover:text-emerald-600"
+                ? "bg-white/80 dark:bg-slate-900/85 border-emerald-200/60 dark:border-emerald-950/60 text-emerald-800 dark:text-emerald-400 font-extrabold shadow-md shadow-emerald-600/5 dark:shadow-emerald-950/10 translate-x-1.5" 
+                : "border-transparent text-slate-600 dark:text-slate-400 font-bold hover:bg-white/60 dark:hover:bg-slate-900/60 hover:text-emerald-700 dark:hover:text-emerald-400 hover:border-white/40 dark:hover:border-slate-800/40 hover:translate-x-1 hover:shadow-sm"
             }`}
           >
-            <div className={`${isActive ? "text-emerald-600" : "opacity-70"}`}>
+            <div className={`transition-transform duration-300 ${isActive ? "text-emerald-600 dark:text-emerald-400 scale-110" : "text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:scale-105"}`}>
               {item.icon}
             </div>
             {item.name}
