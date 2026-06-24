@@ -15,6 +15,9 @@ import {
  getCustomerLedger,
  getLedgerDay,
  logDailyDelivery,
+ deleteDailyDelivery,
+ bulkLogDailyDelivery,
+ getCustomerBillDetails,
 } from "@/ai/tools/mcpTools";
 //import { getDashboardStats } from "@/mcp/tools/dashboard";
 //import { getOutstandingCustomers } from "@/mcp/tools/billing";
@@ -179,6 +182,22 @@ logDailyDelivery
 }
 
 Note: You MUST use the exact parameter names 'customerName', 'itemName', 'dateStr', 'morningDelivered', and 'eveningDelivered'. DO NOT use 'customer', 'item', 'deliveryDate', 'date', 'morning', or 'evening'.
+
+AMBIGUITY RESOLUTION RULE:
+- If any tool execution result returns an error with the code 'AMBIGUOUS_NAME', it means multiple customers matched the search name.
+- You MUST ask the user to clarify by listing the candidates (with their names and mobile numbers) shown in the 'matches' field.
+- Once the user chooses the correct customer, call the tool again using the corresponding 'customerId' from the candidate's object.
+
+BULK LOG, DELETION & BILL DETAILS:
+1. Bulk Log entries for a whole month:
+   - When the user asks to do a bulk entry for a customer for a whole month (e.g. "do bulk entry for Hardik Pandya for June"), use bulkLogDailyDelivery.
+   - If they specify dates to skip (e.g. "skip dates 3, 4, 5"), pass them as an array of numbers in 'skipDates'.
+   - If year is not mentioned, it defaults to the current year 2026.
+2. Delete entry:
+   - When the user asks to delete a delivery entry on a specific date (e.g. "delete Virat Kohli entry for 15 June"), use deleteDailyDelivery.
+   - Make sure to format date to YYYY-MM-DD.
+3. Get bill details:
+   - When the user asks for bill details of a month (e.g. "get June bill for Hardik Pandya"), use getCustomerBillDetails.
 `
 
 ,
@@ -186,14 +205,17 @@ Note: You MUST use the exact parameter names 'customerName', 'itemName', 'dateSt
       messages: modelMessages,
 
       tools: {
-       getCustomersList,
-       getCustomerByName,
-       getDashboardStats,
-       createCustomer,
-       updateCustomer,
-       getCustomerLedger,
-       getLedgerDay,
-       logDailyDelivery,
+        getCustomersList,
+        getCustomerByName,
+        getDashboardStats,
+        createCustomer,
+        updateCustomer,
+        getCustomerLedger,
+        getLedgerDay,
+        logDailyDelivery,
+        deleteDailyDelivery,
+        bulkLogDailyDelivery,
+        getCustomerBillDetails,
       },
 
       toolChoice: "auto",

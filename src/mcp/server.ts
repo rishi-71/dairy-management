@@ -13,6 +13,9 @@ import { getDashboardStats } from "./tools/dashboard";
 
 import { getCustomerLedger, getLedgerDay } from "./tools/ledger";
 import { logDailyDelivery } from "./tools/daily-log";
+import { deleteDailyDelivery } from "./tools/daily-log-delete";
+import { bulkLogDailyDelivery } from "./tools/daily-log-bulk";
+import { getCustomerBillDetails } from "./tools/billing-details";
 
 const app = express();
 
@@ -55,6 +58,15 @@ app.post("/mcp", async (req, res) => {
   return res.json(
     await logDailyDelivery(args)
   );
+
+      case "deleteDailyDelivery":
+        return res.json(await deleteDailyDelivery(args));
+
+      case "bulkLogDailyDelivery":
+        return res.json(await bulkLogDailyDelivery(args));
+
+      case "getCustomerBillDetails":
+        return res.json(await getCustomerBillDetails(args));
 
       default:
         return res.status(404).json({

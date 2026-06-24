@@ -153,3 +153,45 @@ export const logDailyDelivery = tool({
     return await callMCP("logDailyDelivery", input);
   },
 });
+
+export const deleteDailyDelivery = tool({
+  description: "Delete a daily delivery log entry for a customer on a particular date. The dateStr must be in YYYY-MM-DD format. If year is omitted, it defaults to the current year 2026. If itemName is provided, it deletes only that item log, otherwise it deletes all logs for the customer on that date.",
+  inputSchema: z.object({
+    customerName: z.string().optional().describe("The name of the customer"),
+    dateStr: z.string().describe("The date in YYYY-MM-DD format (e.g. 2026-06-12)"),
+    itemName: z.string().optional().describe("Optional itemName to delete a specific item delivery (e.g. 'Cow Milk')"),
+    customerId: z.number().optional().describe("Optional resolved customerId to bypass name ambiguity check"),
+  }),
+  execute: async (input) => {
+    return await callMCP("deleteDailyDelivery", input);
+  },
+});
+
+export const bulkLogDailyDelivery = tool({
+  description: "Perform a bulk entry of daily delivery logs for a customer for a whole month. If any dates are provided in skipDates, it excludes those days from the logging. If year is omitted, it defaults to current year 2026.",
+  inputSchema: z.object({
+    customerName: z.string().optional().describe("The name of the customer"),
+    itemName: z.string().describe("The name of the item, e.g. 'Cow Milk'"),
+    month: z.union([z.string(), z.number()]).describe("Month to log, e.g. 'june', 6, or '06'"),
+    year: z.number().optional().describe("The 4-digit calendar year (e.g. 2026). Defaults to current year 2026."),
+    morningDelivered: z.number().optional().describe("Quantity delivered in the morning (in liters)"),
+    eveningDelivered: z.number().optional().describe("Quantity delivered in the evening (in liters)"),
+    skipDates: z.array(z.number()).optional().describe("Days of the month to skip (e.g. [3, 4, 5])"),
+    customerId: z.number().optional().describe("Optional resolved customerId to bypass name ambiguity check"),
+  }),
+  execute: async (input) => {
+    return await callMCP("bulkLogDailyDelivery", input);
+  },
+});
+
+export const getCustomerBillDetails = tool({
+  description: "Retrieve monthly billing invoice details (milk quantities, totals, outstanding dues, paid status) for a specific customer and month. If the year is omitted, it defaults to the current year 2026.",
+  inputSchema: z.object({
+    customerName: z.string().optional().describe("The name of the customer"),
+    monthYear: z.string().describe("The month to query (e.g. 'june', '2026-06', '06')"),
+    customerId: z.number().optional().describe("Optional resolved customerId to bypass name ambiguity check"),
+  }),
+  execute: async (input) => {
+    return await callMCP("getCustomerBillDetails", input);
+  },
+});
